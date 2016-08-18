@@ -37,7 +37,7 @@ puts changes
 puts '----------'
 
 loop do
-  print '[A]ccept these changes / Manualy [E]dit / [C]ancel Release : '
+  print '[A]ccept these changes / Manually [E]dit / [C]ancel Release : '
   choice = gets.chomp.upcase
 
   case choice
