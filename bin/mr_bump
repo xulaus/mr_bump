@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+# Small script to tag releases and update changelogs
+require 'mr_bump'
+
+release = !MrBump.current_branch[/^release/].nil?
+master = !MrBump.current_branch[/^master$/].nil?
+
+unless release || master
+  puts 'Need to be on either release or master branch'
+  exit 1
+end
+
+unless system('git pull')
+  puts 'Could not update to latest commit on branch. '
+  exit 1
+end
+
+unless File.file?('CHANGELOG.md')
+  puts "Couldn't find CHANGELOG.md. ensure you are in the root of the client directory"
+  exit 1
+end
+
+if release
+  last_release = MrBump.current_uat
+  current_uat_major = MrBump.current_uat_major
+  changes = MrBump.change_log_items_for_range(last_release, "release/#{current_uat_major}")
+else
+  last_release = MrBump.current_master
+  changes = MrBump.change_log_items_for_range(last_release, 'master')
+end
+
+new_release = last_release.bump_patch
+changes = "# #{new_release}#{changes.join('')}"
+
+puts "Changelog:\n----------\n"
+puts changes
+puts '----------'
+
+loop do
+  print '[A]ccept these changes / Manualy [E]dit / [C]ancel Release : '
+  choice = gets.chomp.upcase
+
+  case choice
+  when 'A'
+    MrBump.file_prepend('CHANGELOG.md', changes)
+    break
+  when 'E'
+    MrBump.file_prepend('CHANGELOG.md', changes)
+    print 'Hit enter when you want to continue: '
+    gets
+    break
+  when 'C'
+    exit 1
+  else
+    puts "I'm sorry Dave; I'm afraid I can't do that."
+  end
+end
+
+`git commit -m 'Bump version to #{new_release}' CHANGELOG.md`
+`git tag #{new_release}`
+`git push && git push --tags`
