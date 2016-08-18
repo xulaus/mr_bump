@@ -1,4 +1,4 @@
-## mr_bump
+# mr_bump
 
 Mr Bump is a small utility for helping to version and changelog Git Flow projects.
 
