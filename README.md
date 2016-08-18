@@ -47,10 +47,15 @@ Changelog:
 [A]ccept these changes / Manually [E]dit / [C]ancel Release :
 ```
 
-You can now review the changes. If you are happy with the changes type <kbd>e</kbd> and press <kbd>Enter</kbd>.
+You can now review the changes. If you are happy with the changes type <kbd>a</kbd> and press <kbd>Enter</kbd>.
 
-If you wish to make manual changes to the output, type <kbd>e</kbd> and press <kbd>Enter</kbd>. This will update your `CHANGELOG.md` so you can go to the file and make manual edits.
+If you wish to make manual changes to the output, type <kbd>e</kbd> and press <kbd>Enter</kbd>. This will update your `CHANGELOG.md` and drop you into a nano editor to make modifications to the `CHANGELOG.md`. Make the required modifications and exit nano using the usual commands.
 
-Once you are happy with the changes press <kbd>Enter</kbd>.
+When you have finished editing you will see the following options:
+```
+[A]ccept modified changes / [C]ancel Release :
+```
+
+To accept the changes press <kbd>a</kbd> then press <kbd>Enter</kbd>, alternatively you can abandon the bump by pressing <kbd>c</kbd> then <kbd>Enter</kbd>.
 
 When you submit the changes, the `CHANGELOG.md` will be updated, commited and pushed and the commit will be tagged.

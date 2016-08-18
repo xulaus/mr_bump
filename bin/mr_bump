@@ -32,7 +32,8 @@ end
 new_release = last_release.bump_patch
 changes = "# #{new_release}#{changes.join('')}"
 
-puts "Changelog:\n----------\n"
+puts 'Changelog additions'
+puts '----------'
 puts changes
 puts '----------'
 
@@ -46,8 +47,18 @@ loop do
     break
   when 'E'
     MrBump.file_prepend('CHANGELOG.md', changes)
-    print 'Hit enter when you want to continue: '
-    gets
+    system 'nano CHANGELOG.md'
+    loop do
+      print '[A]ccept modified changes / [C]ancel Release : '
+      choice2 = gets.chomp.upcase
+      if choice2 == 'C'
+        exit 1
+      elsif choice2 == 'A'
+        break
+      else
+        puts "I'm sorry Dave; I'm afraid I can't do that."
+      end
+    end
     break
   when 'C'
     exit 1
