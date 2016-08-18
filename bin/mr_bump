@@ -10,8 +10,13 @@ unless release || master
   exit 1
 end
 
-unless system('git pull')
-  puts 'Could not update to latest commit on branch. '
+unless system('git remote update > /dev/null 2>&1')
+  puts 'Failed to update remotes. (Connectivity problems?)'
+  exit 1
+end
+
+unless `git rev-parse @` == `git rev-parse @{u}`
+  puts 'Not up to date with origin! Please run git pull'
   exit 1
 end
 
