@@ -30,7 +30,8 @@ else
 end
 
 new_release = last_release.bump_patch
-md_changes = "# #{new_release}#{changes.join('')}"
+changes = changes.join('')
+md_changes = "# #{new_release}#{changes}"
 
 puts 'Changelog additions'
 puts '----------'
@@ -71,4 +72,4 @@ end
 `git tag #{new_release}`
 `git push && git push --tags`
 
-MrBump.slack_notifier(new_release, changes.join(''))
+MrBump.slack_notifier(new_release, changes)

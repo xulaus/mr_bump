@@ -4,7 +4,8 @@ module MrBump
   class Slack
 
     def initialize(opts)
-      @webhook = opts["webhook_url"] || (raise ArgumentError, 'No Slack webhook found. Add a webhook to your .mr_bump config')
+      raise ArgumentError, 'No Slack webhook found. Add a webhook to your .mr_bump config' unless opts["webhook_url"]
+      @webhook = opts["webhook_url"]
       @username = opts["username"] || 'Mr Bump'
       if opts['icon']
         @icon = (opts['icon'].is_a? Array) ? opts['icon'].sample : opts['icon']
