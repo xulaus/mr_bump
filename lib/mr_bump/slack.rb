@@ -6,12 +6,14 @@ module MrBump
     def initialize(opts)
       @webhook = opts["webhook_url"] || (raise ArgumentError, 'No Slack webhook found. Add a webhook to your .mr_bump config')
       @username = opts["username"] || 'Mr Bump'
-      @icon = opts["icon"] || File.expand_path(File.dirname(__FILE__ )+ "/../../assets/mr_bump.png")
+      if opts['icon']
+        @icon = (opts['icon'].is_a? Array) ? opts['icon'].sample : opts['icon']
+      end
     end
 
     def bump(version, changes)
       options = {}
-      options[:icon_url] = @icon
+      options[:icon_url] = @icon if @icon
       options[:attachments] = [attatchment(version, changes)]
       notifier.ping ' ', options
     end
