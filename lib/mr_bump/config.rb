@@ -1,3 +1,5 @@
+require 'yaml'
+
 module MrBump
   # This class sets up access to the config file
   class Config

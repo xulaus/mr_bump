@@ -6,7 +6,7 @@ module MrBump
     def initialize(opts)
       @webhook = opts["webhook_url"] || (raise ArgumentError, 'No Slack webhook found. Add a webhook to your .mr_bump config')
       @username = opts["username"] || 'Mr Bump'
-      @icon = opts["icon"] || "../../assets/img/mr_bump.png"
+      @icon = opts["icon"] || File.expand_path(File.dirname(__FILE__ )+ "/../../assets/mr_bump.png")
     end
 
     def bump(version, changes)
