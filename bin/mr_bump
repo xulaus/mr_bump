@@ -77,4 +77,27 @@ end
 `git tag #{new_release}`
 `git push && git push --tags`
 
+config_file = MrBump.config_file()
+branch_type = release ? "release" : 'master'
+bump_cmd_exists = config_file.key?('post_bump') &&
+                  config_file['post_bump'].key?(branch_type)
+if bump_cmd_exists
+  loop do
+    puts 'Would you like to execute post bump commands? '
+    print '[Y]es execute / [N]o Im done : '
+    choice = gets.chomp.upcase
+
+    case choice
+    when 'Y'
+      post_command = config_file['post_bump'][branch_type]
+      system post_command
+      break
+    when 'N'
+      exit 1
+    else
+      puts "I'm sorry Dave; I'm afraid I can't do that."
+    end
+  end
+end
+
 MrBump.slack_notifier(new_release, changes)
