@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name               = 'mr_bump'
-  s.version            = '0.0.2'
+  s.version            = '0.0.3'
   s.default_executable = 'mr_bump'
   s.executables        = ['mr_bump']
 
