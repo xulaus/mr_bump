@@ -9,7 +9,10 @@ Gem::Specification.new do |s|
   s.date = '2016-08-18'
   s.description = 'Bump versions'
   s.email = 'richard.fitzgerald36@gmail.com'
-  s.files = ['lib/mr_bump.rb', 'lib/mr_bump/version.rb', 'bin/mr_bump']
+  s.files = [
+    'lib/mr_bump.rb', 'lib/mr_bump/version.rb', 'lib/mr_bump/slack.rb', 'lib/mr_bump/config.rb',
+    'bin/mr_bump'
+  ]
   s.homepage = 'https://github.com/xulaus/mr_bump'
   s.require_paths = ['lib']
   s.rubygems_version = '1.6.2'

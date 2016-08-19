@@ -38,11 +38,13 @@ module MrBump
   end
 
   def self.story_information(merge_str)
-    merge_fmt = '^Merge pull request #(\d+) from Intellection/(bugfix|feature|hotfix)/(\w+[-_]?\d+)?'
-    matches = Regexp.new(merge_fmt).match(merge_str)
+    branch_fmt = '(?<fix_type>bugfix|feature|hotfix)/(?<dev_id>\w+[-_]?\d+)?'
+    merge_pr_fmt = "^Merge pull request #(?<pr_number>\\d+) from \\w+/#{branch_fmt}"
+    merge_manual_fmt = "^Merge branch '#{branch_fmt}'"
+    matches = Regexp.new(merge_pr_fmt + '|' + merge_manual_fmt).match(merge_str)
     if matches
-      type = matches[2].capitalize
-      dev_id = (matches[3].nil? ? 'UNKNOWN' : matches[3])
+      type = matches['fix_type'].capitalize
+      dev_id = (matches['dev_id'].nil? ? 'UNKNOWN' : matches['dev_id'])
       "#{type} - #{dev_id} - "
     end
   end
@@ -50,7 +52,7 @@ module MrBump
   def self.merge_logs(rev, head)
     git_cmd = "git log --pretty='format:%B' --grep '(^Merge pull request | into #{current_branch}$)' --merges -E"
     log = `#{git_cmd} #{rev}..#{head}`
-    log.each_line.map(&:strip).select { |str| !(str.nil? || str == '') }
+    log.each_line.map(&:strip).select { |str| !(str.nil? || str == '' || str[0] == '#') }
   end
 
   def self.ignored_merges_regex

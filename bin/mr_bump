@@ -21,7 +21,7 @@ unless `git rev-parse @` == `git rev-parse @{u}`
 end
 
 unless File.file?('CHANGELOG.md')
-  puts "Couldn't find CHANGELOG.md. ensure you are in the root of the client directory"
+  puts "Couldn't find CHANGELOG.md. ensure you are in the root of the git checkout"
   exit 1
 end
 
@@ -93,7 +93,7 @@ if bump_cmd_exists
       system post_command
       break
     when 'N'
-      exit 1
+      break
     else
       puts "I'm sorry Dave; I'm afraid I can't do that."
     end
