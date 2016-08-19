@@ -1,21 +1,19 @@
 require 'slack-notifier'
-require 'pry'
 module MrBump
   # This class uses a slack webhook to push notifications to slack
   class Slack
 
     def initialize(opts)
-      @webhook = opts["webhook_url"]
-      @username = opts["username"]
-      @icon = opts["icon"]
+      @webhook = opts["webhook_url"] || (raise ArgumentError, 'No Slack webhook found. Add a webhook to your .mr_bump config')
+      @username = opts["username"] || 'Mr Bump'
+      @icon = opts["icon"] || "../../assets/img/mr_bump.png"
     end
 
     def bump(version, changes)
       options = {}
       options[:icon_url] = @icon
       options[:attachments] = [attatchment(version, changes)]
-      puts 'notifying slack'
-      notifier.ping "Mr Bump: new release!", options
+      notifier.ping ' ', options
     end
 
     def user
@@ -25,7 +23,7 @@ module MrBump
       ].compact.detect { |u| !u.nil? }
     end
 
-    def client
+    def repo_name
       `git config --get remote.origin.url`[/[\w\.]+(?=\.git$)/]
     end
 
@@ -35,7 +33,7 @@ module MrBump
 
     def attatchment(version, changes)
       {
-        title: "#{user} has bumped #{client}",
+        title: "#{user} has bumped #{repo_name}",
         fallback: changes,
         fields: [
                   {title: 'Version', value: version},
