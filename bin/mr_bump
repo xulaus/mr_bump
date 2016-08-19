@@ -30,11 +30,11 @@ else
 end
 
 new_release = last_release.bump_patch
-changes = "# #{new_release}#{changes.join('')}"
+md_changes = "# #{new_release}#{changes.join('')}"
 
 puts 'Changelog additions'
 puts '----------'
-puts changes
+puts md_changes
 puts '----------'
 
 loop do
@@ -43,10 +43,10 @@ loop do
 
   case choice
   when 'A'
-    MrBump.file_prepend('CHANGELOG.md', changes)
+    MrBump.file_prepend('CHANGELOG.md', md_changes)
     break
   when 'E'
-    MrBump.file_prepend('CHANGELOG.md', changes)
+    MrBump.file_prepend('CHANGELOG.md', md_changes)
     system 'nano CHANGELOG.md'
     loop do
       print '[A]ccept modified changes / [C]ancel Release : '
@@ -70,3 +70,5 @@ end
 `git commit -m 'Bump version to #{new_release}' CHANGELOG.md`
 `git tag #{new_release}`
 `git push && git push --tags`
+
+MrBump.slack_notifier(new_release, changes.join(''))

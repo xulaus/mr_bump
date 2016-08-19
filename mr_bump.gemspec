@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.rubygems_version = '1.6.2'
   s.summary = 'BUMP!'
+  s.add_runtime_dependency "slack-notifier", "~> 1.0"
 
   if s.respond_to? :specification_version
     s.specification_version = 3
