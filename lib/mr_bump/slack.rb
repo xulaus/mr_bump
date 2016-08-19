@@ -22,7 +22,7 @@ module MrBump
       [
         ENV["USER"],
         `whoami`
-      ].compact.detect { |u| !u.nil? }
+      ].detect { |u| !u.nil? }
     end
 
     def repo_name
