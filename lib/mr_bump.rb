@@ -67,7 +67,7 @@ module MrBump
     chunked_log.each_slice(2).map do |merge_str, comment|
       merge_str = merge_str[1][0]
       unless merge_str[ignored_merges_regex]
-        "\n * #{story_information(merge_str)}" + comment[1].join("\n   ")
+        "\n* #{story_information(merge_str)}" + comment[1].join("\n  ")
       end
     end.compact
   end

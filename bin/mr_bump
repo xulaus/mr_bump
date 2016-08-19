@@ -36,7 +36,7 @@ end
 
 new_release = last_release.bump_patch
 changes = changes.join('')
-md_changes = "# #{new_release}#{changes}"
+md_changes = "# #{new_release}#{changes}\n\n"
 
 puts 'Changelog additions'
 puts '----------'
