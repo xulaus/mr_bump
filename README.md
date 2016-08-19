@@ -59,3 +59,19 @@ When you have finished editing you will see the following options:
 To accept the changes press <kbd>a</kbd> then press <kbd>Enter</kbd>, alternatively you can abandon the bump by pressing <kbd>c</kbd> then <kbd>Enter</kbd>.
 
 When you submit the changes, the `CHANGELOG.md` will be updated, commited and pushed and the commit will be tagged.
+
+## Config File
+
+The config file should be stored in the root direcotry of the respotitory under the name `.mr_bump`. The config file is a yaml file which constains configurations for Mr Bump.
+
+## Slack Intergration
+
+Mr Bump includes slack intergration with a custom name and icon. To enable Slack integration add the follwoing to your `.mr_bump` config file:
+```
+slack:
+  webhook_url: "https://hooks.slack.com/services/some_custom_webhook"
+  username: "Mr Bump"
+  icon: "https://path_to_image.png"
+```
+
+If you do not wish to use Slack intergration, remove the Slack section from your config file.

@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.executables        = ['mr_bump']
 
   s.required_rubygems_version = Gem::Requirement.new('>= 0') if s.respond_to? :required_rubygems_version=
-  s.authors = ['Richard Fitzgerald']
+  s.authors = ['Richard Fitzgerald', 'Josh Bryant']
   s.date = '2016-08-18'
   s.description = 'Bump versions'
   s.email = 'richard.fitzgerald36@gmail.com'
@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.rubygems_version = '1.6.2'
   s.summary = 'BUMP!'
+  s.add_runtime_dependency "slack-notifier", "~> 1.0"
 
   if s.respond_to? :specification_version
     s.specification_version = 3

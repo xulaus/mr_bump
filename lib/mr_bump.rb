@@ -1,4 +1,6 @@
 require 'mr_bump/version'
+require 'mr_bump/slack'
+require 'mr_bump/config'
 
 module MrBump
   def self.current_branch
@@ -74,10 +76,21 @@ module MrBump
     new_contents = ''
     File.open(file, 'r') do |fd|
       contents = fd.read
-      new_contents = str << contents
+      new_contents = str + contents
     end
     File.open(file, 'w') do |fd|
       fd.write(new_contents)
     end
+
+    def self.config_file
+      MrBump::Config.new().config
+    end
+
+    def self.slack_notifier(version, changelog)
+      if config_file.key? 'slack'
+        MrBump::Slack.new(config_file["slack"]).bump(version, changelog)
+      end
+    end
+
   end
 end
