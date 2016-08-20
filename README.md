@@ -15,7 +15,7 @@ mr_bump will update the changelog with entries in the following format:
  * Bugfix - DA-31 - Some minor bug description
 ```
 
-It takes this information form the branch name and pull request title and comments.
+It takes this information from the branch name and pull request title and comments.
 
 Branches should take the form:
 
@@ -37,7 +37,7 @@ gem 'mr_bump', git: git@github.com:xulaus/mr_bump, require: false
 
 Then run `bundle install`.
 
-When you're ready to bump, switch to either the `release` or `master` branch and run `mr_bump` when you're in the repositry root.
+When you're ready to bump, switch to either the `release` or `master` branch and run `mr_bump` when you're in the repository root.
 
 The output will look something like:
 
@@ -67,11 +67,11 @@ When you submit the changes, the `CHANGELOG.md` will be updated, commited and pu
 
 ## Config
 
-The config file should be stored in the root direcotry of the respotitory under the name `.mr_bump`. The config file is a yaml file which constains configurations for Mr Bump.
+The config file should be stored in the root directory of the repository under the name `.mr_bump`. The config file is a yaml file which contains configurations for Mr Bump.
 
-### Slack Intergration
+### Slack Integration
 
-Mr Bump includes slack intergration with a custom name and icon. To enable Slack integration add the follwoing to your `.mr_bump` config file:
+Mr Bump includes slack integration with a custom name and icon. To enable Slack integration add the following to your `.mr_bump` config file:
 
 ```
 slack:
@@ -80,7 +80,7 @@ slack:
   icon: "https://path_to_image.png"
 ```
 
-If you do not wish to use Slack intergration, remove the Slack section from your config file.
+If you do not wish to use Slack integration, remove the Slack section from your config file.
 
 ### Post bump commands
 
