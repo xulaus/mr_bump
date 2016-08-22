@@ -55,6 +55,12 @@ loop do
     MrBump.file_prepend('CHANGELOG.md', md_changes)
     system 'nano CHANGELOG.md'
     loop do
+      log = File.open('CHANGELOG.md', 'r').read
+      md_changes = log.split("\n\n").first.split("\n").drop(1)
+      puts 'Modified Changelog additions'
+      puts '----------'
+      puts md_changes
+      puts '----------'
       print '[A]ccept modified changes / [C]ancel Release : '
       choice2 = gets.chomp.upcase
       if choice2 == 'C'
@@ -76,6 +82,8 @@ end
 `git commit -m 'Bump version to #{new_release}' CHANGELOG.md`
 `git tag #{new_release}`
 `git push && git push --tags`
+
+MrBump.slack_notifier(new_release, md_changes.join("\n"))
 
 config_file = MrBump.config_file()
 branch_type = release ? "release" : 'master'
@@ -99,5 +107,3 @@ if bump_cmd_exists
     end
   end
 end
-
-MrBump.slack_notifier(new_release, changes)

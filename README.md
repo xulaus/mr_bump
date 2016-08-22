@@ -55,7 +55,7 @@ You can now review the changes. If you are happy with the changes type <kbd>a</k
 
 If you wish to make manual changes to the output, type <kbd>e</kbd> and press <kbd>Enter</kbd>. This will update your `CHANGELOG.md` and drop you into a nano editor to make modifications to the `CHANGELOG.md`. Make the required modifications and exit nano using the usual commands.
 
-When you have finished editing you will see the following options:
+When you have finished editing you will be able to review your changes and be presented with the following options:
 
 ```
 [A]ccept modified changes / [C]ancel Release :
@@ -81,6 +81,18 @@ slack:
 ```
 
 If you do not wish to use Slack integration, remove the Slack section from your config file.
+
+#### JIRA for Slack
+
+Mr Bump can attatch Jira links to Slack posts. To enable this feature, simply add a Jira URL to the Mr Bump config file under `jira_url`:
+
+```
+slack:
+  webhook_url: "https://hooks.slack.com/services/some_custom_webhook"
+  username: "Mr Bump"
+  icon: "https://path_to_image.png"
+  jira_url: "https://some_team.atlassian.net"
+```
 
 ### Post bump commands
 
