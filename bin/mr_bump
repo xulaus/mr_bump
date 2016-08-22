@@ -56,7 +56,9 @@ loop do
     system 'nano CHANGELOG.md'
     loop do
       log = File.open('CHANGELOG.md', 'r').read
-      md_changes = log.split("\n\n").first.split("\n").drop(1)
+      changes = log.split("\n\n").first.strip.split("\n").drop(1)
+      changes = changes.join("\n")
+      md_changes = "# #{new_release}\n#{changes}\n\n"
       puts 'Modified Changelog additions'
       puts '----------'
       puts md_changes
@@ -83,7 +85,7 @@ end
 `git tag #{new_release}`
 `git push && git push --tags`
 
-MrBump.slack_notifier(new_release, md_changes.join("\n"))
+MrBump.slack_notifier(new_release, changes)
 
 config_file = MrBump.config_file()
 branch_type = release ? "release" : 'master'
