@@ -43,7 +43,7 @@ module MrBump
     def git_shas(changes)
       jira_ids(changes).map do |ticket|
         if ticket != 'UNKNOWN' && !@git.get_sha(ticket).nil?
-          "<#{@git.repo_url}/commit/#{@git.get_sha(ticket)}'|Git merge link - #{ticket}>\n"
+          "<#{@git.repo_url}/commit/#{@git.get_sha(ticket)}|Git merge link - #{ticket}>\n"
         end
       end.join
     end
