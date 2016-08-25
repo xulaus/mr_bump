@@ -1,6 +1,8 @@
 require 'mr_bump/version'
 require 'mr_bump/slack'
 require 'mr_bump/config'
+require 'mr_bump/git_config'
+
 
 module MrBump
   def self.current_branch
@@ -90,7 +92,7 @@ module MrBump
 
     def self.slack_notifier(version, changelog)
       if config_file.key? 'slack'
-        MrBump::Slack.new(config_file["slack"]).bump(version, changelog)
+        MrBump::Slack.new(MrBump::GitConfig.from_current_path, config_file["slack"]).bump(version, changelog)
       end
     end
 

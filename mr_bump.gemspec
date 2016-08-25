@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email = 'richard.fitzgerald36@gmail.com'
   s.files = [
     'lib/mr_bump.rb', 'lib/mr_bump/version.rb', 'lib/mr_bump/slack.rb', 'lib/mr_bump/config.rb',
-    'bin/mr_bump'
+    'bin/mr_bump', 'lib/mr_bump/git_config.rb'
   ]
   s.homepage = 'https://github.com/xulaus/mr_bump'
   s.require_paths = ['lib']

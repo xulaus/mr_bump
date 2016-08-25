@@ -10,6 +10,12 @@ unless release || master
   exit 1
 end
 
+unless master || MrBump.current_branch.to_s == "release/#{MrBump.current_uat_major}"
+  puts "On release branch '#{MrBump.current_branch}'. " \
+       "Expected release branch 'release/#{MrBump.current_uat_major}'"
+  exit 1
+end
+
 unless system('git remote update > /dev/null 2>&1')
   puts 'Failed to update remotes. (Connectivity problems?)'
   exit 1
