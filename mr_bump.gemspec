@@ -1,6 +1,7 @@
 Gem::Specification.new do |s|
   s.name               = 'mr_bump'
   s.version            = '0.0.10'
+  s.licenses           = ['MPL 2.0']
   s.default_executable = 'mr_bump'
   s.executables        = ['mr_bump']
 
@@ -17,7 +18,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.rubygems_version = '1.6.2'
   s.summary = 'BUMP!'
-  s.add_runtime_dependency "slack-notifier", "~> 1.0"
+  s.add_runtime_dependency 'slack-notifier', '~> 1.0'
 
   if s.respond_to? :specification_version
     s.specification_version = 3
