@@ -12,14 +12,15 @@ Gem::Specification.new do |s|
   s.email = 'richard.fitzgerald36@gmail.com'
   s.files = [
     'lib/mr_bump.rb', 'lib/mr_bump/version.rb', 'lib/mr_bump/slack.rb', 'lib/mr_bump/config.rb',
-    'bin/mr_bump', 'lib/mr_bump/git_config.rb'
+    'bin/mr_bump', 'lib/mr_bump/git_config.rb', 'lib/mr_bump/change.rb'
   ]
   s.homepage = 'https://github.com/xulaus/mr_bump'
   s.require_paths = ['lib']
   s.rubygems_version = '1.6.2'
   s.summary = 'BUMP!'
-  s.add_runtime_dependency 'slack-notifier', '~> 1.0'
-  s.add_runtime_dependency 'octokit', '~> 4.0'
+  s.add_dependency 'slack-notifier', '~> 1.0'
+  s.add_dependency 'octokit', '~> 4.0'
+  s.add_dependency 'mustache', '~> 0.99.3'
   s.add_development_dependency 'rspec'
 
   if s.respond_to? :specification_version

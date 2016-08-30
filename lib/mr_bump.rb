@@ -6,6 +6,7 @@ require 'mr_bump/version'
 require 'mr_bump/slack'
 require 'mr_bump/config'
 require 'mr_bump/git_config'
+require 'mr_bump/change'
 
 module MrBump
   def self.current_branch
@@ -28,7 +29,11 @@ module MrBump
     uat = current_uat_major
     vers = `git tag -l`
     vers = vers.each_line.map do |branch|
-      MrBump::Version.new(branch) rescue nil
+      begin
+        MrBump::Version.new(branch)
+      rescue
+        nil
+      end
     end.compact
     vers.select { |ver| ver.major == uat.major && ver.minor == uat.minor }.max
   end
@@ -37,21 +42,13 @@ module MrBump
     uat = current_uat_major
     vers = `git tag -l`
     vers = vers.each_line.map do |branch|
-      MrBump::Version.new(branch) rescue nil
+      begin
+        MrBump::Version.new(branch)
+      rescue
+        nil
+      end
     end.compact
     vers.select { |ver| ver < uat }.max
-  end
-
-  def self.story_information(merge_str)
-    branch_fmt = '(?<fix_type>bugfix|feature|hotfix)/(?<dev_id>\w+[-_]?\d+)?'
-    merge_pr_fmt = "^Merge pull request #(?<pr_number>\\d+) from \\w+/#{branch_fmt}"
-    merge_manual_fmt = "^Merge branch '#{branch_fmt}'"
-    matches = Regexp.new(merge_pr_fmt + '|' + merge_manual_fmt).match(merge_str)
-    if matches
-      type = matches['fix_type'].capitalize
-      dev_id = (matches['dev_id'].nil? ? 'UNKNOWN' : matches['dev_id'])
-      "#{type} - #{dev_id} - "
-    end
   end
 
   def self.merge_logs(rev, head)
@@ -72,9 +69,10 @@ module MrBump
   def self.change_log_items_for_range(rev, head)
     chunked_log = merge_logs(rev, head).chunk { |change| change[/^Merge/].nil? }
     chunked_log.each_slice(2).map do |merge_str, comment|
-      merge_str = merge_str[1][0]
-      unless merge_str[ignored_merges_regex]
-        "\n* #{story_information(merge_str)}" + comment[1].join("\n  ")
+      begin
+        MrBump::Change.new(config_file, merge_str[1][0], comment[1]).to_md
+      rescue ArgumentError => e
+        puts e
       end
     end.compact
   end
@@ -91,15 +89,14 @@ module MrBump
   end
 
   def self.config_file
-    @config_file ||= MrBump::Config.new().config
+    @config_file ||= MrBump::Config.new.config
   end
 
   def self.slack_notifier(version, changelog)
     if config_file.key? 'slack'
-      MrBump::Slack.new(git_config, config_file["slack"]).bump(version, changelog)
+      MrBump::Slack.new(git_config, config_file['slack']).bump(version, changelog)
     end
   end
-
   def self.git_config
     @git_config ||= MrBump::GitConfig.from_current_path
   end

@@ -1,0 +1,27 @@
+# Slack integration
+
+# Mr Bump can be configured to post a message to slack while bumping.
+# To do so, a slack web hook is needed, as well as an icon and user name
+# format for this configuration is below
+#slack:
+#  webhook_url: "https://hooks.slack.com/services/some_custom_webhook"
+#  username: "Mr Bump"
+#  icon: "https://path_to_image.png"
+
+# Post bump hooks
+
+# Mr Bump can also run custom deploy or other commands after a bumping
+#post_bump:
+#  release: "echo 'There has been a release on the release branch'"
+#  master: "echo 'There has been a release on the master branch'"
+
+
+# Changelog template
+# Your changelog can be customized by using a template. The template is in
+# mustache format. The allowed parameters are
+#   - branch_type: Bugfix / Feature / Hotfix
+#   - dev_id: The development ID for this feature
+#   - comment_lines: Array of all lines in commit comment
+#   - first_commit_line: The first line of the commit comment
+#   - comment_body: The rest of the lines in the comment
+markdown_template: " * {{branch_type}} - {{dev_id}} - {{first_comment_line}}{{#comment_body}}\n  {{.}}{{/comment_body}}"

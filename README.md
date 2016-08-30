@@ -129,6 +129,20 @@ Pressing <kbd>Y</kbd> will execute commands as listed in the config. Pressing <k
 
 If you do not include anything under the `post_bump` key in your `.mr_bump` config, you will not be prompted and mr_bump will simply exit after pushing the tags and changelog.
 
+### Customising the changlog format
+
+Your changelog can be customized by using the `markdown_template` configuration option. The template is in mustache format. The allowed parameters are
+ * `branch_type`: Bugfix / Feature / Hotfix
+ * `dev_id`: The development ID for this feature
+ * `comment_lines`: Array of all lines in commit comment
+ * `first_commit_line`: The first line of the commit comment
+ * `comment_body`: The rest of the lines in the comment
+
+The default is:
+```
+markdown_template: " * {{branch_type}} - {{dev_id}} - {{first_comment_line}}{{#comment_body}}\n  {{.}}{{/comment_body}}"
+```
+
 ##Git token
 
 Mr Bump uses the Git Hub API. To do this you require a access token. The token should be stored in `~/.git_token`.

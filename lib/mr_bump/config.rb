@@ -13,17 +13,23 @@ module MrBump
       @config_file = config_file || default_file
     end
 
+    def defaults
+      @defaults = begin
+        defaults_yml = File.join(File.dirname(__FILE__), '..', '..', 'defaults.yml')
+        YAML.load_file(defaults_yml)
+      end
+    end
+
     def config
-      @config ||= if File.exist?(@config_file)
-        YAML.load_file(@config_file) || {}
-      else
-        {}
+      @config ||= begin
+        loaded = YAML.load_file(@config_file) if File.exist?(@config_file)
+        loaded ||= {}
+        defaults.merge(loaded)
       end
     end
 
     def default_file
-      File.join(".mr_bump")
+      File.join('.mr_bump')
     end
-
   end
 end
