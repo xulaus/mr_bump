@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.summary = 'BUMP!'
   s.add_runtime_dependency 'slack-notifier', '~> 1.0'
   s.add_runtime_dependency 'octokit', '~> 4.0'
+  s.add_development_dependency 'rspec'
 
   if s.respond_to? :specification_version
     s.specification_version = 3
