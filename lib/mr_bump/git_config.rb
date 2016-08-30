@@ -5,16 +5,18 @@
 module MrBump
   # This class gathers configuration infromation from git
   class GitConfig
-    attr_reader :user, :username, :repo_url, :repo_name, :orgin
+    attr_reader :user, :username, :repo_url, :host, :path, :repo_name, :orgin
     GITHUB_URL_REGEX = Regexp.new(
       '(https?://((?<user>[\w_\-\d]+)@)?|git@)(?<domain>github.com)[:/](?<path>[\w_\-\d]+)/' \
       '(?<repo_name>[\w_\-\d\.]+?)(\.git)?$'
     ).freeze
 
-    def initialize(origin, repo_name, repo_url, username, user)
+    def initialize(origin, repo_name, repo_host, repo_path, username, user)
       @origin = origin
       @repo_name = repo_name
-      @repo_url = repo_url
+      @repo_url = repo_host + '/' + repo_path + '/'
+      @host = repo_host
+      @path = repo_path
       @username = username
       @user = user || `git config user.name`
     end
@@ -26,7 +28,8 @@ module MrBump
       GitConfig.new(
         origin,
         match['repo_name'],
-        "https://#{match['domain']}/#{match['path']}/#{match['repo_name']}/",
+        "https://#{match['domain']}",
+        "#{match['path']}/#{match['repo_name']}",
         match['user'],
         user
       )

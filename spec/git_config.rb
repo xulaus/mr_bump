@@ -20,6 +20,14 @@ describe MrBump::GitConfig do
     it "doesn't extract a username" do
       expect(config.username.nil?)
     end
+
+    it "extracts correct host" do
+      expect(config.host).to eq('https://github.com')
+    end
+
+    it "extracts the correct path" do
+      expect(config.path).to eq('xulaus/mr_bump')
+    end
   end
 
   context 'Given https origin with username' do
@@ -34,6 +42,14 @@ describe MrBump::GitConfig do
     it 'correctly extracts the username' do
       expect(config.username).to eq('xulaus')
     end
+
+    it "extracts correct host" do
+      expect(config.host).to eq('https://github.com')
+    end
+
+    it "extracts the correct path" do
+      expect(config.path).to eq('xulaus/mr_bump')
+    end
   end
 
   context 'Given git origin' do
@@ -47,6 +63,14 @@ describe MrBump::GitConfig do
 
     it "doesn't extract a username" do
       expect(config.username.nil?)
+    end
+
+    it "extracts correct host" do
+      expect(config.host).to eq('https://github.com')
+    end
+
+    it "extracts the correct path" do
+      expect(config.path).to eq('xulaus/mr_bump')
     end
   end
 end

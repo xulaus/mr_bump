@@ -5,6 +5,7 @@
 
 # Small script to tag releases and update changelogs
 require 'mr_bump'
+require 'mr_bump/git_api'
 
 release = !MrBump.current_branch[/^release/].nil?
 master = !MrBump.current_branch[/^master$/].nil?
@@ -18,6 +19,28 @@ unless master || MrBump.current_branch.to_s == "release/#{MrBump.current_uat_maj
   puts "On release branch '#{MrBump.current_branch}'. " \
        "Expected release branch 'release/#{MrBump.current_uat_major}'"
   exit 1
+end
+
+puts 'Have you already closed your PR?'
+loop do
+  print '[Y]es / [N]o : '
+  choice = gets.chomp.upcase
+
+  case choice
+  when 'Y'
+    break
+  when 'N'
+    puts 'Here are the 10 most recent PRs in your repo:'
+    puts MrBump::GitApi.sorted_prs(MrBump.git_config.path)
+    loop do
+      print 'Enter the PR number to merge : '
+      pr_id = gets.chomp
+      MrBump::GitApi.merge_pr(MrBump.git_config.path, pr_id)
+      break
+    end
+  else
+    puts "I'm sorry Dave; I'm afraid I can't do that."
+  end
 end
 
 unless system('git remote update > /dev/null 2>&1')

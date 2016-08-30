@@ -7,7 +7,6 @@ require 'mr_bump/slack'
 require 'mr_bump/config'
 require 'mr_bump/git_config'
 
-
 module MrBump
   def self.current_branch
     @current_branch ||= `git rev-parse --abbrev-ref HEAD`
@@ -89,16 +88,19 @@ module MrBump
     File.open(file, 'w') do |fd|
       fd.write(new_contents)
     end
+  end
 
-    def self.config_file
-      MrBump::Config.new().config
+  def self.config_file
+    @config_file ||= MrBump::Config.new().config
+  end
+
+  def self.slack_notifier(version, changelog)
+    if config_file.key? 'slack'
+      MrBump::Slack.new(git_config, config_file["slack"]).bump(version, changelog)
     end
+  end
 
-    def self.slack_notifier(version, changelog)
-      if config_file.key? 'slack'
-        MrBump::Slack.new(MrBump::GitConfig.from_current_path, config_file["slack"]).bump(version, changelog)
-      end
-    end
-
+  def self.git_config
+    @git_config ||= MrBump::GitConfig.from_current_path
   end
 end

@@ -39,7 +39,21 @@ Then run `bundle install`.
 
 When you're ready to bump, switch to either the `release` or `master` branch and run `mr_bump` when you're in the repository root.
 
-The output will look something like:
+You will initially be asked if your PR has been recently closed. You will be prompted with a Yes/No option. If you select no, mr_bump will desplay the 10 most recent PRs in your repository and ask for the PR ID for the PR you wish to close, the output will look something like this:
+
+```
+Here are the 10 most recent PRs in your repo:
+#1234 - Most recent pull request title
+#1235 - Another pull request title
+#1236 - Final pull request title
+Enter the PR number to merge : 1234
+```
+
+If you see `404 - Not Found` it is likely that your access token is invalid.
+
+Type the number of the PR you wish to merge and press <kbd>Enter</kbd>. Git Hub API errors are usually well explained and you will see an error like `405 - Pull Request is not mergeable` if Git is unable to close your PR. This will exit mr_bump.
+
+You will now be able to view your changes, the output will look something like:
 
 ```
 Changelog:
@@ -65,7 +79,7 @@ To accept the changes press <kbd>a</kbd> then press <kbd>Enter</kbd>, alternativ
 
 When you submit the changes, the `CHANGELOG.md` will be updated, commited and pushed and the commit will be tagged.
 
-## Config
+## Config File
 
 The config file should be stored in the root directory of the repository under the name `.mr_bump`. The config file is a yaml file which contains configurations for Mr Bump.
 
@@ -115,3 +129,15 @@ Pressing <kbd>Y</kbd> will execute commands as listed in the config. Pressing <k
 
 If you do not include anything under the `post_bump` key in your `.mr_bump` config, you will not be prompted and mr_bump will simply exit after pushing the tags and changelog.
 
+##Git token
+
+Mr Bump uses the Git Hub API. To do this you require a access token. The token should be stored in `~/.git_token`.
+
+To generate your token follow the guide here: https://help.github.com/articles/creating-an-access-token-for-command-line-use/
+
+The git_token file should only contain the token and no new lines or additional text, eg:
+
+```
+>> cat ~/.git_token
+0d51e8dbc4802d27eebc913bc1e6844a57773076
+```
