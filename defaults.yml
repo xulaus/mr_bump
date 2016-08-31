@@ -24,4 +24,4 @@
 #   - comment_lines: Array of all lines in commit comment
 #   - first_commit_line: The first line of the commit comment
 #   - comment_body: The rest of the lines in the comment
-markdown_template: " * {{branch_type}} - {{dev_id}} - {{first_comment_line}}{{#comment_body}}\n  {{.}}{{/comment_body}}"
+markdown_template: " * {{branch_type}} - {{dev_id}} - {{first_comment_line}}{{#comment_body}}\n   {{.}}{{/comment_body}}"
