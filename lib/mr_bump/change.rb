@@ -5,7 +5,7 @@ module MrBump
   class Change
     attr_reader :pr_number, :branch_type, :dev_id, :config, :comment_lines
 
-    BRANCH_FMT = '(?<branch_type>bugfix|feature|hotfix)/(?<dev_id>\w+[-_]?\d+)?[\\w\\-_]+'.freeze
+    BRANCH_FMT = '((?<branch_type>bugfix|feature|hotfix)/)?(?<dev_id>\w+[-_]?\d+)?[\\w\\-_]+'.freeze
     MERGE_PR_FMT = "^Merge pull request #(?<pr_number>\\d+) from [\\w\\-_]+/#{BRANCH_FMT}".freeze
     MERGE_MANUAL_FMT = "^Merge branch '#{BRANCH_FMT}'".freeze
     MERGE_REGEX = Regexp.new(MERGE_PR_FMT + '|' + MERGE_MANUAL_FMT).freeze
@@ -15,7 +15,7 @@ module MrBump
       raise ArgumentError, "Couldn't extract merge information from commit message " \
                            "'#{commit_msg}'" unless matches
       @config = config
-      @branch_type = matches['branch_type'].capitalize
+      @branch_type = (matches['branch_type'] || 'Task').capitalize
       @dev_id = matches['dev_id'] || 'UNKNOWN'
       @pr_number = matches['pr_number'] || ''
       @comment_lines = Array(comment_lines)

@@ -7,6 +7,19 @@
 require 'mr_bump'
 require 'mr_bump/git_api'
 
+def menu(text, valid_options, &block)
+  loop do
+    print text + ': '
+    choice = gets.chomp.upcase
+    if valid_options.include? choice
+      block.call(choice)
+      break
+    else
+      puts "I'm sorry Dave; I'm afraid I can't do that."
+    end
+  end
+end
+
 release = !MrBump.current_branch[/^release/].nil?
 master = !MrBump.current_branch[/^master$/].nil?
 
@@ -22,14 +35,9 @@ unless master || MrBump.current_branch.to_s == "release/#{MrBump.current_uat_maj
 end
 
 puts 'Have you already closed your PR?'
-loop do
-  print '[Y]es / [N]o : '
-  choice = gets.chomp.upcase
 
-  case choice
-  when 'Y'
-    break
-  when 'N'
+menu '[Y]es / [N]o', %w(Y N) do |choice|
+  if choice == 'N'
     puts 'Here are the 10 most recent PRs in your repo:'
     puts MrBump::GitApi.sorted_prs(MrBump.git_config.path)
     loop do
@@ -38,8 +46,6 @@ loop do
       MrBump::GitApi.merge_pr(MrBump.git_config.path, pr_id)
       break
     end
-  else
-    puts "I'm sorry Dave; I'm afraid I can't do that."
   end
 end
 
@@ -68,50 +74,35 @@ else
 end
 
 new_release = last_release.bump_patch
-changes = changes.join('')
-md_changes = "# #{new_release}#{changes}\n\n"
+changes = changes.join("\n")
+md_changes = "# #{new_release}\n#{changes}\n\n"
 
 puts 'Changelog additions'
 puts '----------'
 puts md_changes
 puts '----------'
 
-loop do
-  print '[A]ccept these changes / Manually [E]dit / [C]ancel Release : '
-  choice = gets.chomp.upcase
-
-  case choice
-  when 'A'
-    MrBump.file_prepend('CHANGELOG.md', md_changes)
-    break
-  when 'E'
-    MrBump.file_prepend('CHANGELOG.md', md_changes)
-    system 'nano CHANGELOG.md'
-    loop do
-      log = File.open('CHANGELOG.md', 'r').read
-      changes = log.split("\n\n").first.strip.split("\n").drop(1)
-      changes = changes.join("\n")
-      md_changes = "# #{new_release}\n#{changes}\n\n"
-      puts 'Modified Changelog additions'
-      puts '----------'
-      puts md_changes
-      puts '----------'
-      print '[A]ccept modified changes / [C]ancel Release : '
-      choice2 = gets.chomp.upcase
-      if choice2 == 'C'
-        exit 1
-      elsif choice2 == 'A'
-        break
-      else
-        puts "I'm sorry Dave; I'm afraid I can't do that."
-      end
-    end
-    break
-  when 'C'
+menu '[A]ccept these changes / Manually [E]dit / [C]ancel Release', %w(A E C) do |choice|
+  if choice == 'C'
     exit 1
-  else
-    puts "I'm sorry Dave; I'm afraid I can't do that."
+  elsif choice == 'E'
+    tempfile = Tempfile.new('CHANGELOG')
+    tempfile.write(changes)
+    tempfile.close
+    system "nano #{tempfile.path}"
+    changes = File.open(tempfile.path, 'r').read.rstrip
+    md_changes = "# #{new_release}\n#{changes}\n\n"
+    puts 'Modified Changelog additions'
+    puts '----------'
+    puts md_changes
+    puts '----------'
+
+    menu '[A]ccept modified changes / [C]ancel Release', %w(A C) do |cancel|
+      exit 1 if cancel == 'C'
+    end
   end
+
+  MrBump.file_prepend('CHANGELOG.md', md_changes)
 end
 
 `git commit -m 'Bump version to #{new_release}' CHANGELOG.md`
@@ -125,20 +116,8 @@ branch_type = release ? "release" : 'master'
 bump_cmd_exists = config_file.key?('post_bump') &&
                   config_file['post_bump'].key?(branch_type)
 if bump_cmd_exists
-  loop do
-    puts 'Would you like to execute post bump commands? '
-    print '[Y]es execute / [N]o Im done : '
-    choice = gets.chomp.upcase
-
-    case choice
-    when 'Y'
-      post_command = config_file['post_bump'][branch_type]
-      system post_command
-      break
-    when 'N'
-      break
-    else
-      puts "I'm sorry Dave; I'm afraid I can't do that."
-    end
+  puts 'Would you like to execute post bump commands? '
+  menu '[Y]es execute / [N]o Im done', %w(Y N) do |choice|
+    system(config_file['post_bump'][branch_type]) if choice == 'Y'
   end
 end

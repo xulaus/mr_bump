@@ -249,4 +249,23 @@ describe MrBump::Change do
       expect(change.to_md).to eq(" * Hotfix - UNKNOWN - Line 1\n  Line 2")
     end
   end
+
+  context 'when no merge type given' do
+    let(:merge_str) { 'Merge pull request #1224 from Xulaus/gem_bump' }
+    it 'extracts the correct PR Number' do
+      expect(change.pr_number).to eq('1224')
+    end
+
+    it 'defaults the branch type to "Task"' do
+      expect(change.branch_type).to eq('Task')
+    end
+
+    it 'defaults the dev ID to UNKNOWN' do
+      expect(change.dev_id).to eq('UNKNOWN')
+    end
+
+    it 'renders to markdown correctly' do
+      expect(change.to_md).to eq(" * Task - UNKNOWN - Line 1\n  Line 2")
+    end
+  end
 end
