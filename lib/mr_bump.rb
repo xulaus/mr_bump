@@ -15,12 +15,12 @@ module MrBump
   end
 
   def self.current_uat_major
-    prefix = 'origin/release/'
+    prefix = 'origin/release'
     vers = `git branch -r`
-    regex = Regexp.new("^#{prefix}(\\d+\\.\\d+\\.0)$")
+    regex = Regexp.new("^#{prefix}(-|\/)(\\d+\\.\\d+\\.0)$")
     vers = vers.each_line.map do |branch|
       branch = branch.strip
-      MrBump::Version.new(branch.gsub(regex, '\1')) if branch[regex]
+      MrBump::Version.new(branch.gsub(regex, '\2')) if branch[regex]
     end.compact
     vers.max
   end
