@@ -61,6 +61,18 @@ unless `git rev-parse @` == `git rev-parse @{u}`
   exit 1
 end
 
+unless MrBump.all_tagged_versions.include? MrBump.current_uat_major
+  base_sha = `git merge_base release/#{MrBump.current_uat_major} develop`
+
+  puts "Missing tag for version #{MrBump.current_uat_major}. Suggesting commit #{base_sha[0...8]}"
+  puts "\t#{`git log --format="(%ci) %cn - %s" -n 1 #{base_sha}`}"
+  puts 'Would you like to tag this commit?'
+  menu '[Y]es / [N]o', %w(Y N) do |choice|
+    exit 1 if choice == 'N'
+  end
+  `git tag #{MrBump.current_uat_major} #{base_sha}`
+end
+
 unless File.file?(changelog)
   puts "Couldn't find CHANGELOG.md at '#{changelog}'."
   exit 1
