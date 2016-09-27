@@ -88,6 +88,8 @@ mr_bump --dry-run
 
 The config file should be stored in the root directory of the repository under the name `.mr_bump`. The config file is a yaml file which contains configurations for Mr Bump.
 
+Users can customise their own defaults by putting the relevent config option in a file called `~/.mr_bump.yml`. Project level configuration will overide these options.
+
 ### Slack Integration
 
 Mr Bump includes slack integration with a custom name and icon. To enable Slack integration add the following to your `.mr_bump` config file:
@@ -150,13 +152,13 @@ markdown_template: " * {{branch_type}} - {{dev_id}} - {{first_comment_line}}{{#c
 
 ##Git token
 
-Mr Bump uses the Git Hub API. To do this you require a access token. The token should be stored in `~/.git_token`.
+Mr Bump uses the Git Hub API. To do this you require a access token. The token should be stored in `~/.mr_bump.yml`.
 
 To generate your token follow the guide here: https://help.github.com/articles/creating-an-access-token-for-command-line-use/
 
 The git_token file should only contain the token and no new lines or additional text, eg:
 
 ```
->> cat ~/.git_token
-0d51e8dbc4802d27eebc913bc1e6844a57773076
+>> cat ~/.mr_bump.yml
+github_api_token: 0d51e8dbc4802d27eebc913bc1e6844a57773076
 ```

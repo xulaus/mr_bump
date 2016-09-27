@@ -6,23 +6,19 @@ require 'octokit'
 module MrBump
   # This class makes calls to the github API
   class GitApi
-    def self.token
-      File.read( File.expand_path('~') + "/.git_token")
+    def initialize(token)
+      @client = Octokit::Client.new(access_token: token)
     end
 
-    def self.client
-      @client ||= Octokit::Client.new(:access_token => token)
+    def prs(repo_url)
+      @prs ||= client.pull_requests(repo_url, state: 'open')
     end
 
-    def self.prs(repo_url)
-      @prs ||= client.pull_requests(repo_url, :state => 'open')
+    def sorted_prs(repo_url)
+      prs(repo_url).map { |x| '#' + x[:number].to_s + ' - ' + x[:title].to_s + "\n" }.first(10).join
     end
 
-    def self.sorted_prs(repo_url)
-      prs(repo_url).map { |x| "#" + x[:number].to_s + " - " + x[:title].to_s + "\n" }.first(10).join
-    end
-
-    def self.merge_pr(repo_url, pr_id)
+    def merge_pr(repo_url, pr_id)
       client.merge_pull_request(repo_url, pr_id)
     end
   end

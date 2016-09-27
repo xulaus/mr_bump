@@ -51,19 +51,28 @@ unless master || MrBump.current_branch.to_s == "release/#{MrBump.current_uat_maj
   exit 1
 end
 
+unless MrBump.config_file['github_api_token']
+  puts "Couldn't find a github API token in configuration files"
+  puts "Please obtain a github token by following the guide at\n" \
+       "  https://help.github.com/articles/creating-an-access-token-for-command-line-use/\n" \
+       "and add it with the 'github_api_token:' option"
+  exit 1
+end
+
 puts 'Have you already closed your PR?'
 
+github_client = MrBump::GitApi.new(MrBump.config_file['github_api_token'])
 menu '[Y]es / [N]o', %w(Y N) do |choice|
   if choice == 'N'
     puts 'Here are the 10 most recent PRs in your repo:'
-    puts MrBump::GitApi.sorted_prs(MrBump.git_config.path)
+    puts github_client.sorted_prs(MrBump.git_config.path)
     loop do
       print 'Enter the PR number to merge : '
       pr_id = gets.chomp
       if options[:dryrun]
         puts "dryrun: Would merge ##{pr_id}"
       else
-        MrBump::GitApi.merge_pr(MrBump.git_config.path, pr_id)
+        github_client.merge_pr(MrBump.git_config.path, pr_id)
       end
       break
     end
