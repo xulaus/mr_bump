@@ -1,3 +1,15 @@
+# 0.1.0
+* Move GitHub API key to a real config file - [PR](https://github.com/xulaus/mr_bump/pull/23)
+* Add dry run option - [PR](https://github.com/xulaus/mr_bump/pull/22)
+* Better tests for MrBump module - [PR](https://github.com/xulaus/mr_bump/pull/14), [Issue](https://github.com/xulaus/mr_bump/issues/8)
+* Find CHANGELOG via absolute path rather than relative - [PR](https://github.com/xulaus/mr_bump/pull/16)
+* Write to intermediate files rather than the CHANGLOG for intermediate states - [PR](https://github.com/xulaus/mr_bump/pull/13)
+* Customisation of individual changes using Mustache templates - [PR](https://github.com/xulaus/mr_bump/pull/6)
+* Rename specs so RSpec can run without file specification - [PR](https://github.com/xulaus/mr_bump/pull/11)
+* Add access to github API for reviewing and closing PR - - [PR](https://github.com/xulaus/mr_bump/pull/10)
+* Start using MPL 2.0 license - [PR](https://github.com/xulaus/mr_bump/pull/9)
+
+
 # 0.0.10
 * Fix formatting issue with slack integration [Commit](https://github.com/xulaus/mr_bump/commit/f33452d5fded9810166e5e41bfc87f1fc228218c)
 
