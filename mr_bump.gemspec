@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'octokit', '~> 4.0'
   s.add_dependency 'mustache', '~> 0.99.3'
   s.add_development_dependency 'rspec'
+  s.add_development_dependency 'pry'
 
   if s.respond_to? :specification_version
     s.specification_version = 3

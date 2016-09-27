@@ -14,41 +14,42 @@ module MrBump
     @current_branch.strip
   end
 
+  def self.latest_release_from_list(branches)
+    prefix = 'origin/release[-/]'
+    regex = Regexp.new("^#{prefix}(\\d+\\.\\d+)\\.\\d+$")
+    branches.map do |branch|
+      matches = regex.match(branch)
+      MrBump::Version.new(matches[1]) if matches
+    end.compact.max
+  end
+
   def self.current_uat_major
-    prefix = 'origin/release'
-    vers = `git branch -r`
-    regex = Regexp.new("^#{prefix}(-|\/)(\\d+\\.\\d+\\.0)$")
-    vers = vers.each_line.map do |branch|
-      branch = branch.strip
-      MrBump::Version.new(branch.gsub(regex, '\2')) if branch[regex]
+    branches = `git branch -r`.each_line.map(&:strip)
+    latest_release_from_list(branches)
+  end
+
+  def self.all_tags
+    all_tags.each_line.map(&:strip)
+  end
+
+  def self.all_tagged_versions
+    all_tags.map do |tag|
+      begin
+        MrBump::Version.new(tag)
+      rescue
+        nil
+      end
     end.compact
-    vers.max
   end
 
   def self.current_uat
     uat = current_uat_major
-    vers = `git tag -l`
-    vers = vers.each_line.map do |branch|
-      begin
-        MrBump::Version.new(branch)
-      rescue
-        nil
-      end
-    end.compact
-    vers.select { |ver| ver.major == uat.major && ver.minor == uat.minor }.max
+    all_tagged_versions.select { |ver| ver.major == uat.major && ver.minor == uat.minor }.max
   end
 
   def self.current_master
     uat = current_uat_major
-    vers = `git tag -l`
-    vers = vers.each_line.map do |branch|
-      begin
-        MrBump::Version.new(branch)
-      rescue
-        nil
-      end
-    end.compact
-    vers.select { |ver| ver < uat }.max
+    all_tagged_versions.select { |ver| ver < uat }.max
   end
 
   def self.merge_logs(rev, head)
@@ -97,6 +98,7 @@ module MrBump
       MrBump::Slack.new(git_config, config_file['slack']).bump(version, changelog)
     end
   end
+
   def self.git_config
     @git_config ||= MrBump::GitConfig.from_current_path
   end
