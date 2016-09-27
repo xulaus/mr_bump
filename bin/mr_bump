@@ -23,6 +23,8 @@ end
 release = !MrBump.current_branch[/^release/].nil?
 master = !MrBump.current_branch[/^master$/].nil?
 
+changelog = "#{`git rev-parse --show-toplevel`}/CHANGELOG.md"
+
 unless release || master
   puts 'Need to be on either release or master branch'
   exit 1
@@ -59,8 +61,8 @@ unless `git rev-parse @` == `git rev-parse @{u}`
   exit 1
 end
 
-unless File.file?('CHANGELOG.md')
-  puts "Couldn't find CHANGELOG.md. ensure you are in the root of the git checkout"
+unless File.file?(changelog)
+  puts "Couldn't find CHANGELOG.md at '#{changelog}'."
   exit 1
 end
 
@@ -102,10 +104,10 @@ menu '[A]ccept these changes / Manually [E]dit / [C]ancel Release', %w(A E C) do
     end
   end
 
-  MrBump.file_prepend('CHANGELOG.md', md_changes)
+  MrBump.file_prepend(changelog, md_changes)
 end
 
-`git commit -m 'Bump version to #{new_release}' CHANGELOG.md`
+`git commit -m 'Bump version to #{new_release}' #{changelog}`
 `git tag #{new_release}`
 `git push && git push --tags`
 
