@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name               = 'mr_bump'
-  s.version            = '0.0.10'
+  s.version            = '0.1.0'
   s.licenses           = ['MPL 2.0']
   s.default_executable = 'mr_bump'
   s.executables        = ['mr_bump']
@@ -27,10 +27,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'pry'
 
-  if s.respond_to? :specification_version
-    s.specification_version = 3
-
-    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0')
-    end
-  end
+  s.specification_version = 3 if s.respond_to? :specification_version
 end
