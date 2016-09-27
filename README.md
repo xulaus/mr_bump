@@ -79,6 +79,11 @@ To accept the changes press <kbd>a</kbd> then press <kbd>Enter</kbd>, alternativ
 
 When you submit the changes, the `CHANGELOG.md` will be updated, commited and pushed and the commit will be tagged.
 
+If you wish to see what `mr_bump` would do without actually changing anything, you can use
+```
+mr_bump --dry-run
+```
+
 ## Config File
 
 The config file should be stored in the root directory of the repository under the name `.mr_bump`. The config file is a yaml file which contains configurations for Mr Bump.

@@ -29,7 +29,7 @@ module MrBump
   end
 
   def self.all_tags
-    all_tags.each_line.map(&:strip)
+    `git tag -l`.each_line.map(&:strip)
   end
 
   def self.all_tagged_versions

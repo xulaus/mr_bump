@@ -3,7 +3,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-# Small script to tag releases and update changelogs
+# Script to tag releases and update changelogs
+require 'optparse'
+
 require 'mr_bump'
 require 'mr_bump/git_api'
 
@@ -20,10 +22,23 @@ def menu(text, valid_options, &block)
   end
 end
 
+options = {
+  dryrun: false
+}
+OptionParser.new do |parser|
+  parser.on(
+    '-n', '--dry-run',
+    'Make no changes to git state (except to update remotes), and change some fatal errors to ' \
+    'warnings'
+  ) do
+    options[:dryrun] = true
+  end
+end.parse!
+
 release = !MrBump.current_branch[/^release/].nil?
 master = !MrBump.current_branch[/^master$/].nil?
 
-changelog = "#{`git rev-parse --show-toplevel`}/CHANGELOG.md"
+changelog = "#{`git rev-parse --show-toplevel`.strip}/CHANGELOG.md"
 
 unless release || master
   puts 'Need to be on either release or master branch'
@@ -45,7 +60,11 @@ menu '[Y]es / [N]o', %w(Y N) do |choice|
     loop do
       print 'Enter the PR number to merge : '
       pr_id = gets.chomp
-      MrBump::GitApi.merge_pr(MrBump.git_config.path, pr_id)
+      if options[:dryrun]
+        puts "dryrun: Would merge ##{pr_id}"
+      else
+        MrBump::GitApi.merge_pr(MrBump.git_config.path, pr_id)
+      end
       break
     end
   end
@@ -57,8 +76,12 @@ unless system('git remote update > /dev/null 2>&1')
 end
 
 unless `git rev-parse @` == `git rev-parse @{u}`
-  puts 'Not up to date with origin! Please run git pull'
-  exit 1
+  if options[:dryrun]
+    puts 'WARNING! Not up to date with origin! Please run git pull'
+  else
+    puts 'Not up to date with origin! Please run git pull'
+    exit 1
+  end
 end
 
 unless MrBump.all_tagged_versions.include? MrBump.current_uat_major
@@ -80,8 +103,8 @@ end
 
 if release
   last_release = MrBump.current_uat
-  current_uat_major = MrBump.current_uat_major
-  changes = MrBump.change_log_items_for_range(last_release, "release/#{current_uat_major}")
+  uat_major = MrBump.current_uat_major
+  changes = MrBump.change_log_items_for_range(last_release, "release/#{uat_major}")
 else
   last_release = MrBump.current_master
   changes = MrBump.change_log_items_for_range(last_release, 'master')
@@ -116,14 +139,19 @@ menu '[A]ccept these changes / Manually [E]dit / [C]ancel Release', %w(A E C) do
     end
   end
 
-  MrBump.file_prepend(changelog, md_changes)
+  MrBump.file_prepend(changelog, md_changes) unless options[:dryrun]
 end
 
-`git commit -m 'Bump version to #{new_release}' #{changelog}`
-`git tag #{new_release}`
-`git push && git push --tags`
-
-MrBump.slack_notifier(new_release, changes)
+if options[:dryrun]
+  puts "dry-run: `git commit -m 'Bump version to #{new_release}' -- #{changelog}`"
+  puts "dry-run: `git tag #{new_release}`"
+  puts 'dry-run: git push && git push --tags`'
+else
+  `git commit -m 'Bump version to #{new_release}' -- #{changelog}`
+  `git tag #{new_release}`
+  `git push && git push --tags`
+  MrBump.slack_notifier(new_release, changes)
+end
 
 config_file = MrBump.config_file()
 branch_type = release ? "release" : 'master'
@@ -132,6 +160,12 @@ bump_cmd_exists = config_file.key?('post_bump') &&
 if bump_cmd_exists
   puts 'Would you like to execute post bump commands? '
   menu '[Y]es execute / [N]o Im done', %w(Y N) do |choice|
-    system(config_file['post_bump'][branch_type]) if choice == 'Y'
+    if choice == 'Y'
+      if options[:dryrun]
+        puts "dry-run: `#{config_file['post_bump'][branch_type]}`"
+      else
+        system(config_file['post_bump'][branch_type])
+      end
+    end
   end
 end
