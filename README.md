@@ -2,7 +2,7 @@
 
 Mr Bump is a small utility for helping to version and changelog Git Flow projects.
 
-It requires a develop branch (where most of your developing goes), a release branch in the form `release/\d+.\d+.\d+`, and a master branch.
+It requires a develop branch (where most of your developing goes), a release branch with an embedded version number in the form `\d+.\d+(.\d+)?`, and a master branch.
 
 You will need ruby installed and a Linux or Mac system.
 
@@ -162,3 +162,16 @@ The git_token file should only contain the token and no new lines or additional 
 >> cat ~/.mr_bump.yml
 github_api_token: 0d51e8dbc4802d27eebc913bc1e6844a57773076
 ```
+
+## Customising release branch names
+Both user level and project level config options support two options for customisation of branch names, `release_prefix` and `release_suffix`. The default is:
+```
+release_prefix: release/
+release_suffix:
+```
+This means `mr_bump` will look for branches in the form `release/0.0.0`. If for example, you would rather your "UAT" style branches were in the form `v0.0.0-testing`, you would set these varables to
+```
+release_prefix: v
+release_suffix: -testing
+```
+

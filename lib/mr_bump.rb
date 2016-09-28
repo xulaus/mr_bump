@@ -15,18 +15,37 @@ module MrBump
     @current_branch.strip
   end
 
+  def self.release_branch_regex
+    prefix = Regexp.escape(config_file['release_prefix'])
+    suffix = Regexp.escape(config_file['release_suffix'])
+    "#{prefix}(\\d+\\.\\d+)(\\.\\d+)?#{suffix}"
+  end
+
+  def self.on_release_branch?
+    regex = Regexp.new("^#{release_branch_regex}$")
+    !MrBump.current_branch[regex].nil?
+  end
+
+  def self.on_master_branch?
+    !MrBump.current_branch[/^master$/].nil?
+  end
+
   def self.latest_release_from_list(branches)
-    prefix = 'origin/release[-/]'
-    regex = Regexp.new("^#{prefix}(\\d+\\.\\d+)\\.\\d+$")
+    regex = Regexp.new("^origin/#{release_branch_regex}$")
     branches.map do |branch|
       matches = regex.match(branch)
       MrBump::Version.new(matches[1]) if matches
-    end.compact.max
+    end.compact.max || MrBump::Version.new('0.0.0')
   end
 
   def self.current_uat_major
     branches = `git branch -r`.each_line.map(&:strip)
     latest_release_from_list(branches)
+  end
+
+  def self.uat_branch
+    config = MrBump.config_file
+    "#{config['release_prefix']}#{current_uat_major}#{config['release_suffix']}"
   end
 
   def self.all_tags

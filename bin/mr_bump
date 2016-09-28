@@ -35,8 +35,8 @@ OptionParser.new do |parser|
   end
 end.parse!
 
-release = !MrBump.current_branch[/^release/].nil?
-master = !MrBump.current_branch[/^master$/].nil?
+release = MrBump.on_release_branch?
+master = MrBump.on_master_branch?
 
 changelog = "#{`git rev-parse --show-toplevel`.strip}/CHANGELOG.md"
 
@@ -45,9 +45,9 @@ unless release || master
   exit 1
 end
 
-unless master || MrBump.current_branch.to_s == "release/#{MrBump.current_uat_major}"
+unless master || MrBump.current_branch.to_s == MrBump.uat_branch
   puts "On release branch '#{MrBump.current_branch}'. " \
-       "Expected release branch 'release/#{MrBump.current_uat_major}'"
+       "Expected release branch '#{MrBump.uat_branch}'"
   exit 1
 end
 
@@ -94,7 +94,7 @@ unless `git rev-parse @` == `git rev-parse @{u}`
 end
 
 unless MrBump.all_tagged_versions.include? MrBump.current_uat_major
-  base_sha = `git merge_base release/#{MrBump.current_uat_major} develop`
+  base_sha = `git merge_base #{MrBump.uat_branch} develop`
 
   puts "Missing tag for version #{MrBump.current_uat_major}. Suggesting commit #{base_sha[0...8]}"
   puts "\t#{`git log --format="(%ci) %cn - %s" -n 1 #{base_sha}`}"
@@ -112,8 +112,7 @@ end
 
 if release
   last_release = MrBump.current_uat
-  uat_major = MrBump.current_uat_major
-  changes = MrBump.change_log_items_for_range(last_release, "release/#{uat_major}")
+  changes = MrBump.change_log_items_for_range(last_release, MrBump.uat_branch)
 else
   last_release = MrBump.current_master
   changes = MrBump.change_log_items_for_range(last_release, 'master')

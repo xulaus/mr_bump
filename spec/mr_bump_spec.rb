@@ -125,9 +125,20 @@ describe MrBump do
   end
 
   describe '#latest_release_from_list' do
+    before(:each) { allow(MrBump).to receive(:config_file).and_return(config) }
+    let(:result) { MrBump.latest_release_from_list(branch_list) }
+    let(:config) do
+      {
+        'release_prefix' => "release#{separator}",
+        'release_suffix' => suffix
+      }
+    end
+    let(:suffix) { '' }
+    let(:separator) { '/' }
+
     context 'With many release branches and using slash separator' do
-      it 'extracts the highest version' do
-        branch_list = [
+      let(:branch_list) do
+        [
           'origin/release/10.16.0',
           'origin/release/10.15.9',
           'origin/release/10.1.0',
@@ -136,25 +147,31 @@ describe MrBump do
           'origin/master',
           ''
         ]
-        expect(MrBump.latest_release_from_list(branch_list)).to eq(MrBump::Version.new('10.16.0'))
+      end
+
+      it 'extracts the highest version' do
+        expect(result).to eq(MrBump::Version.new('10.16.0'))
       end
     end
 
     context 'With a single release branch and using slash separator' do
-      it 'extracts the version' do
-        branch_list = [
+      let(:branch_list) do
+        [
           'origin/release/10.16.9',
           'origin/rse/1.2.0',
           'origin/master',
           ''
         ]
-        expect(MrBump.latest_release_from_list(branch_list)).to eq(MrBump::Version.new('10.16.0'))
+      end
+
+      it 'extracts the version' do
+        expect(result).to eq(MrBump::Version.new('10.16.0'))
       end
     end
 
     context 'With many release branches and minor versions and using slash separator' do
-      it 'extracts the highest version with patch version set to 0' do
-        branch_list = [
+      let(:branch_list) do
+        [
           'origin/release/10.16.0',
           'origin/release/10.15.9',
           'origin/release/10.1.0',
@@ -164,74 +181,249 @@ describe MrBump do
           'origin/master',
           ''
         ]
-        expect(MrBump.latest_release_from_list(branch_list)).to eq(MrBump::Version.new('10.16.0'))
+      end
+
+      it 'extracts the highest version with patch version set to 0' do
+        expect(result).to eq(MrBump::Version.new('10.16.0'))
       end
     end
 
     context 'With a single release branch with a patch number and using slash separator' do
-      it 'extracts the version with patch version set to 0' do
-        branch_list = [
+      let(:branch_list) do
+        [
           'origin/release/10.16.9',
           'origin/rse/1.2.0',
           'origin/master',
           ''
         ]
-        expect(MrBump.latest_release_from_list(branch_list)).to eq(MrBump::Version.new('10.16.0'))
       end
-    end
 
-    context 'With many release branches and using dash separator' do
-      it 'extracts the highest version' do
-        branch_list = [
-          'origin/release-10.16.0',
-          'origin/release-10.15.9',
-          'origin/release-10.1.0',
-          'origin/release-10.15.0',
-          'origin/rse-10.16.0',
-          'origin/master',
-          ''
-        ]
-        expect(MrBump.latest_release_from_list(branch_list)).to eq(MrBump::Version.new('10.16.0'))
-      end
-    end
-
-    context 'With a single release branch and using dash separator' do
-      it 'extracts the version' do
-        branch_list = [
-          'origin/release-10.16.9',
-          'origin/rse-1.2.0',
-          'origin/master',
-          ''
-        ]
-        expect(MrBump.latest_release_from_list(branch_list)).to eq(MrBump::Version.new('10.16.0'))
-      end
-    end
-
-    context 'With many release branches and minor versions and using dash separator' do
-      it 'extracts the highest version with patch version set to 0' do
-        branch_list = [
-          'origin/release-10.16.0',
-          'origin/release-10.15.9',
-          'origin/release-10.1.0',
-          'origin/release-10.15.0',
-          'origin/release-10.16.9',
-          'origin/rse-10.16.0',
-          'origin/master',
-          ''
-        ]
-        expect(MrBump.latest_release_from_list(branch_list)).to eq(MrBump::Version.new('10.16.0'))
-      end
-    end
-
-    context 'With a single release branch with a patch number and using dash separator' do
       it 'extracts the version with patch version set to 0' do
-        branch_list = [
-          'origin/release-10.16.9',
-          'origin/rse-1.2.0',
+        expect(result).to eq(MrBump::Version.new('10.16.0'))
+      end
+    end
+
+    context 'With no release branches' do
+      let(:branch_list) do
+        [
+        ]
+      end
+
+      it 'returns 0.0.0 as the version' do
+        expect(result).to eq(MrBump::Version.new('0.0.0'))
+      end
+    end
+
+    context 'With many release branches and changing the default prefix' do
+      let(:branch_list) do
+        [
+          'origin/release?10.16.0',
+          'origin/release/10.17.0',
+          'origin/release?10.15.9',
+          'origin/release/10.1.0',
+          'origin/release/10.15.0',
+          'origin/rse/10.16.0',
           'origin/master',
           ''
         ]
-        expect(MrBump.latest_release_from_list(branch_list)).to eq(MrBump::Version.new('10.16.0'))
+      end
+      let(:separator) { '?' }
+
+      it 'extracts the correct highest version, igoring branches with incorrect prefix' do
+        expect(result).to eq(MrBump::Version.new('10.16.0'))
+      end
+    end
+
+    context 'With many release branches and changing the default suffix' do
+      let(:branch_list) do
+        [
+          'origin/release/10.16.0.',
+          'origin/release/10.17.0.',
+          'origin/release/10.15.9.',
+          'origin/release/10.1.0.',
+          'origin/release/10.15.0',
+          'origin/release/10.18.0',
+          'origin/rse/10.16.0',
+          'origin/master',
+          ''
+        ]
+      end
+      let(:suffix) { '.' }
+
+      it 'extracts the correct highest version, igoring branches with incorrect suffix' do
+        expect(result).to eq(MrBump::Version.new('10.17.0'))
+      end
+    end
+
+    context 'With many release branches and changing the default prefix' do
+      let(:branch_list) do
+        [
+          'origin/release?10.16.0?',
+          'origin/release/10.17.0?',
+          'origin/release?10.15.9?',
+          'origin/release/10.1.0?',
+          'origin/release/10.15.0?',
+          'origin/release/11.1.0',
+          'origin/release/11.15.0',
+          'origin/release?12.1.0',
+          'origin/release?12.15.0',
+          'origin/rse/10.16.0?',
+          'origin/master',
+          ''
+        ]
+      end
+      let(:separator) { '?' }
+      let(:suffix) { '?' }
+
+      it 'extracts the correct highest version, igoring branches with incorrect prefix or suffix' do
+        expect(result).to eq(MrBump::Version.new('10.16.0'))
+      end
+    end
+  end
+
+  describe '#on_master_branch?' do
+    before(:each) { allow(MrBump).to receive(:current_branch).and_return(current_branch) }
+
+    context 'when on a branch called master' do
+      let(:current_branch) { 'master' }
+
+      it 'returns true' do
+        expect(MrBump.on_master_branch?).to eq(true)
+      end
+    end
+
+    context 'when on a branch called master$' do
+      let(:current_branch) { 'master$' }
+
+      it 'returns false' do
+        expect(MrBump.on_master_branch?).to eq(false)
+      end
+    end
+
+    context 'when on a branch called ^master' do
+      let(:current_branch) { '^master' }
+
+      it 'returns false' do
+        expect(MrBump.on_master_branch?).to eq(false)
+      end
+    end
+
+    context 'when on a branch called release' do
+      let(:current_branch) { 'release' }
+
+      it 'returns false' do
+        expect(MrBump.on_master_branch?).to eq(false)
+      end
+    end
+  end
+
+  describe '#on_release_branch?' do
+    before(:each) { allow(MrBump).to receive(:current_branch).and_return(current_branch) }
+    before(:each) { allow(MrBump).to receive(:config_file).and_return(config) }
+
+    context 'with default config' do
+      let(:config) do
+        {
+          'release_prefix' => 'release/',
+          'release_suffix' => ''
+        }
+      end
+      context 'when on a branch called master' do
+        let(:current_branch) { 'master' }
+
+        it 'returns false' do
+          expect(MrBump.on_release_branch?).to eq(false)
+        end
+      end
+
+      context 'when on a branch called release/' do
+        let(:current_branch) { 'release/' }
+
+        it 'returns false' do
+          expect(MrBump.on_release_branch?).to eq(false)
+        end
+      end
+
+      context 'when on a branch called release/0.0.0' do
+        let(:current_branch) { 'release/0.0.0' }
+
+        it 'returns true' do
+          expect(MrBump.on_release_branch?).to eq(true)
+        end
+      end
+
+      context 'when on a branch called release/0.0' do
+        let(:current_branch) { 'release/0.0' }
+
+        it 'returns true' do
+          expect(MrBump.on_release_branch?).to eq(true)
+        end
+      end
+    end
+
+    context 'with altered config' do
+      let(:config) do
+        {
+          'release_prefix' => '?v',
+          'release_suffix' => '+'
+        }
+      end
+
+      context 'branch with correct prefix and suffix' do
+        let(:current_branch) { '?v0.0.0+' }
+
+        it 'returns true' do
+          expect(MrBump.on_release_branch?).to eq(true)
+        end
+      end
+
+      context 'branch with correct prefix and suffix and missing patch version' do
+        let(:current_branch) { '?v0.0+' }
+
+        it 'returns true' do
+          expect(MrBump.on_release_branch?).to eq(true)
+        end
+      end
+
+      context 'on a branch which is valid  with default config' do
+        let(:current_branch) { 'release/0.0.0' }
+
+        it 'returns false' do
+          expect(MrBump.on_release_branch?).to eq(false)
+        end
+      end
+    end
+  end
+
+  describe '#uat_branch?' do
+    before(:each) do
+      allow(MrBump).to receive(:current_uat_major).and_return(MrBump::Version.new('0.0.0'))
+    end
+    before(:each) { allow(MrBump).to receive(:config_file).and_return(config) }
+
+    context 'with default config' do
+      let(:config) do
+        {
+          'release_prefix' => 'release/',
+          'release_suffix' => ''
+        }
+      end
+
+      it 'correctly constucts uat branch name' do
+        expect(MrBump.uat_branch).to eq('release/0.0.0')
+      end
+    end
+
+    context 'with altered config' do
+      let(:config) do
+        {
+          'release_prefix' => '?v',
+          'release_suffix' => '+'
+        }
+      end
+
+      it 'correctly constucts uat branch name' do
+        expect(MrBump.uat_branch).to eq('?v0.0.0+')
       end
     end
   end
