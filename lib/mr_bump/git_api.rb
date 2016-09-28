@@ -6,6 +6,8 @@ require 'octokit'
 module MrBump
   # This class makes calls to the github API
   class GitApi
+    attr_accessor :client
+
     def initialize(token)
       @client = Octokit::Client.new(access_token: token)
     end
