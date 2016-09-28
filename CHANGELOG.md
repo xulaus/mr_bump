@@ -1,3 +1,10 @@
+# 0.2.0
+* Fix error when trying to use `git merge-base` - [PR](https://github.com/xulaus/mr_bump/pull/28)
+* Add error when master version cannot be detected. - [PR](https://github.com/xulaus/mr_bump/pull/29)
+* Fix error on PR list load - [PR](https://github.com/xulaus/mr_bump/pull/30) [Issue]- [PR](https://github.com/xulaus/mr_bump/pull/24) 
+* Make release branch name configurable - [PR](https://github.com/xulaus/mr_bump/pull/25)
+* Code Cleanup - [PR](https://github.com/xulaus/mr_bump/pull/15)
+
 # 0.1.0
 * Move GitHub API key to a real config file - [PR](https://github.com/xulaus/mr_bump/pull/23)
 * Add dry run option - [PR](https://github.com/xulaus/mr_bump/pull/22)
