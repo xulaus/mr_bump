@@ -175,3 +175,15 @@ release_prefix: v
 release_suffix: -testing
 ```
 
+# Trouble shooting
+
+When first running `mr_bump`, if you are alreading using something similar to the workflow `mr_bump` enforces but without tagging, you may get a error saying something like
+```
+Couldn't detect the version of the master branch. At least one tagged version with version less than the current release version (10.19.0) needs to exist
+```
+This can be fixed by tagging the last major release. As an example, for the above a command like the following will fix this.
+```
+git tag 10.18.0 e30afcd
+```
+
+The tagged commit needs to be an ancestor of `master`'s head

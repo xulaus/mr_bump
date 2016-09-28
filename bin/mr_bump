@@ -115,6 +115,12 @@ if release
   changes = MrBump.change_log_items_for_range(last_release, MrBump.uat_branch)
 else
   last_release = MrBump.current_master
+  unless last_release
+    puts "Couldn't detect the version of the master branch. " \
+         "At least one tagged version with version less than the current release version " \
+         "(#{MrBump.current_uat_major}) needs to exist"
+    exit 1
+  end
   changes = MrBump.change_log_items_for_range(last_release, 'master')
 end
 
