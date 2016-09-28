@@ -8,6 +8,7 @@ require 'mr_bump/config'
 require 'mr_bump/git_config'
 require 'mr_bump/change'
 
+# Add helper functions to the MrBump namespace
 module MrBump
   def self.current_branch
     @current_branch ||= `git rev-parse --abbrev-ref HEAD`
@@ -53,7 +54,8 @@ module MrBump
   end
 
   def self.merge_logs(rev, head)
-    git_cmd = "git log --pretty='format:%B' --grep '(^Merge pull request | into #{current_branch}$)' --merges -E"
+    git_cmd = "git log --pretty='format:%B' --grep " \
+              "'(^Merge pull request | into #{current_branch}$)' --merges -E"
     log = `#{git_cmd} #{rev}..#{head}`
     log.each_line.map(&:strip).select { |str| !(str.nil? || str == '' || str[0] == '#') }
   end

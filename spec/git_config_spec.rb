@@ -21,11 +21,11 @@ describe MrBump::GitConfig do
       expect(config.username.nil?)
     end
 
-    it "extracts correct host" do
+    it 'extracts correct host' do
       expect(config.host).to eq('https://github.com')
     end
 
-    it "extracts the correct path" do
+    it 'extracts the correct path' do
       expect(config.path).to eq('xulaus/mr_bump')
     end
   end
@@ -43,11 +43,11 @@ describe MrBump::GitConfig do
       expect(config.username).to eq('xulaus')
     end
 
-    it "extracts correct host" do
+    it 'extracts correct host' do
       expect(config.host).to eq('https://github.com')
     end
 
-    it "extracts the correct path" do
+    it 'extracts the correct path' do
       expect(config.path).to eq('xulaus/mr_bump')
     end
   end
@@ -65,11 +65,11 @@ describe MrBump::GitConfig do
       expect(config.username.nil?)
     end
 
-    it "extracts correct host" do
+    it 'extracts correct host' do
       expect(config.host).to eq('https://github.com')
     end
 
-    it "extracts the correct path" do
+    it 'extracts the correct path' do
       expect(config.path).to eq('xulaus/mr_bump')
     end
   end

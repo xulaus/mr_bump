@@ -11,8 +11,7 @@ module MrBump
       '(?<repo_name>[\w_\-\d\.]+?)(\.git)?$'
     ).freeze
 
-    def initialize(origin, repo_name, repo_host, repo_path, username, user)
-      @origin = origin
+    def initialize(repo_name, repo_host, repo_path, username, user)
       @repo_name = repo_name
       @repo_url = repo_host + '/' + repo_path + '/'
       @host = repo_host
@@ -25,14 +24,8 @@ module MrBump
       match = GITHUB_URL_REGEX.match(origin)
       raise ArgumentError,
             "Couldn't parse needed information from remote url '#{git_url}'" unless match
-      GitConfig.new(
-        origin,
-        match['repo_name'],
-        "https://#{match['domain']}",
-        "#{match['path']}/#{match['repo_name']}",
-        match['user'],
-        user
-      )
+      GitConfig.new(match['repo_name'], "https://#{match['domain']}",
+                    "#{match['path']}/#{match['repo_name']}", match['user'], user)
     end
 
     def self.from_current_path

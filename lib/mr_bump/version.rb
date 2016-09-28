@@ -12,14 +12,14 @@ module MrBump
       regex = Regexp.new('^([0-9]+)(\.([0-9]+)(\.([0-9]*))?)?')
       numbers = version_str.match(regex).captures
       @major = numbers[0].to_i
-      @minor = (numbers.size > 2) ? numbers[2].to_i : 0
-      @patch = (numbers.size > 4) ? numbers[4].to_i : 0
+      @minor = numbers.size > 2 ? numbers[2].to_i : 0
+      @patch = numbers.size > 4 ? numbers[4].to_i : 0
     end
 
     def <=>(other)
       major_com = major <=> other.major
-      minor_com = (major_com == 0) ? minor <=> other.minor : major_com
-      (minor_com == 0) ? patch <=> other.patch : minor_com
+      minor_com = major_com.zero? ? minor <=> other.minor : major_com
+      minor_com.zero? ? patch <=> other.patch : minor_com
     end
 
     def to_s

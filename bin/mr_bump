@@ -9,12 +9,12 @@ require 'optparse'
 require 'mr_bump'
 require 'mr_bump/git_api'
 
-def menu(text, valid_options, &block)
+def menu(text, valid_options)
   loop do
     print text + ': '
     choice = gets.chomp.upcase
     if valid_options.include? choice
-      block.call(choice)
+      yield(choice)
       break
     else
       puts "I'm sorry Dave; I'm afraid I can't do that."
@@ -163,7 +163,7 @@ else
 end
 
 config_file = MrBump.config_file()
-branch_type = release ? "release" : 'master'
+branch_type = release ? 'release' : 'master'
 bump_cmd_exists = config_file.key?('post_bump') &&
                   config_file['post_bump'].key?(branch_type)
 if bump_cmd_exists

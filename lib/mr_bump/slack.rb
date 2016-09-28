@@ -11,7 +11,7 @@ module MrBump
       @webhook = opts['webhook_url']
       @username = opts['username'] || 'Mr Bump'
       @jira_url = opts['jira_url']
-      @icon = (opts['icon'].is_a? Array) ? opts['icon'].sample : opts['icon']
+      @icon = opts['icon'].is_a? Array ? opts['icon'].sample : opts['icon']
       @git = git_config
     end
 
@@ -52,10 +52,11 @@ module MrBump
       end.join
     end
 
+    # rubocop:disable Metrics/MethodLength
     def attatchment(version, changes)
       {
         fallback: changes,
-        color: "#009de4",
+        color: '#009de4',
         author_name: @git.user,
         author_icon: @git.user_icon,
         author_link: @git.user_link,
@@ -66,7 +67,7 @@ module MrBump
           jira_field(changes),
           { value: git_shas(changes), short: true }
         ],
-        mrkdwn_in: ["text", "title", "fallback", "fields"]
+        mrkdwn_in: %w(text title fallback fields)
       }
     end
   end
