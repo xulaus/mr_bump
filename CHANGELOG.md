@@ -1,7 +1,10 @@
+# 0.2.1
+* Fix crash when attempting to send Slack message [PR](https://github.com/xulaus/mr_bump/pull/#37)
+
 # 0.2.0
 * Fix error when trying to use `git merge-base` - [PR](https://github.com/xulaus/mr_bump/pull/28)
 * Add error when master version cannot be detected. - [PR](https://github.com/xulaus/mr_bump/pull/29)
-* Fix error on PR list load - [PR](https://github.com/xulaus/mr_bump/pull/30) [Issue]- [PR](https://github.com/xulaus/mr_bump/pull/24) 
+* Fix error on PR list load - [PR](https://github.com/xulaus/mr_bump/pull/30) [Issue](https://github.com/xulaus/mr_bump/pull/24) 
 * Make release branch name configurable - [PR](https://github.com/xulaus/mr_bump/pull/25)
 * Code Cleanup - [PR](https://github.com/xulaus/mr_bump/pull/15)
 
