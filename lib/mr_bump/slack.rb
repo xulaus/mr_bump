@@ -6,12 +6,14 @@ require 'slack-notifier'
 module MrBump
   # This class uses a slack webhook to push notifications to slack
   class Slack
+    attr_accessor :webhook, :username, :jira_url, :icon, :git
+
     def initialize(git_config, opts)
       raise ArgumentError, 'No Slack webhook found.' unless opts['webhook_url']
       @webhook = opts['webhook_url']
       @username = opts['username'] || 'Mr Bump'
       @jira_url = opts['jira_url']
-      @icon = opts['icon'].is_a? Array ? opts['icon'].sample : opts['icon']
+      @icon = Array(opts['icon']).sample
       @git = git_config
     end
 
