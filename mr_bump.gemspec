@@ -29,6 +29,11 @@ Gem::Specification.new do |s|
   s.add_dependency 'OptionParser'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'pry'
+  s.add_development_dependency 'simplecov'
+  s.add_development_dependency 'json', '~> 1.8'
+  s.add_development_dependency 'tins', '~> 1.6.0'
+  s.add_development_dependency 'term-ansicolor', '~>1.3.1'
+  s.add_development_dependency 'coveralls'
 
   s.specification_version = 3 if s.respond_to? :specification_version
 end

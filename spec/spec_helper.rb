@@ -5,4 +5,17 @@
 require 'bundler/setup'
 Bundler.setup
 
+require 'simplecov'
+require 'coveralls'
+
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  SimpleCov::Formatter::HTMLFormatter,
+  Coveralls::SimpleCov::Formatter
+]
+SimpleCov.start do
+  add_filter 'spec'
+  track_files '**/*.rb'
+  track_files 'bin/mr_bump'
+end
+
 require 'mr_bump'
