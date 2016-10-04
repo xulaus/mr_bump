@@ -10,6 +10,7 @@ describe MrBump::GitConfig do
 
   context 'Given https origin with no username' do
     let(:origin) { 'https://github.com/xulaus/mr_bump' }
+
     it 'correctly extracts the repository name' do
       expect(config.repo_name).to eq('mr_bump')
     end
@@ -20,6 +21,14 @@ describe MrBump::GitConfig do
 
     it "doesn't extract a username" do
       expect(config.username.nil?)
+    end
+
+    it "doesn't provide a user icon url" do
+      expect(config.user_icon.nil?)
+    end
+
+    it "doesn't provide a user GitHub url" do
+      expect(config.user_link.nil?)
     end
 
     it 'extracts correct host' do
@@ -33,15 +42,25 @@ describe MrBump::GitConfig do
 
   context 'Given https origin with username' do
     let(:origin) { 'https://xulaus@github.com/xulaus/mr_bump.git' }
+
     it 'correctly extracts the repository name' do
       expect(config.repo_name).to eq('mr_bump')
     end
+
     it 'correctly constructs github url' do
       expect(config.repo_url).to eq('https://github.com/xulaus/mr_bump/')
     end
 
     it 'correctly extracts the username' do
       expect(config.username).to eq('xulaus')
+    end
+
+    it 'provides a user icon url' do
+      expect(config.user_icon).to be_a(String)
+    end
+
+    it 'provides a user GitHub url' do
+      expect(config.user_link).to be_a(String)
     end
 
     it 'extracts correct host' do
@@ -64,6 +83,14 @@ describe MrBump::GitConfig do
 
     it "doesn't extract a username" do
       expect(config.username.nil?)
+    end
+
+    it "doesn't provide a user icon url" do
+      expect(config.user_icon.nil?)
+    end
+
+    it "doesn't provide a user GitHub url" do
+      expect(config.user_link.nil?)
     end
 
     it 'extracts correct host' do
