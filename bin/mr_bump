@@ -29,8 +29,7 @@ options = {
 OptionParser.new do |parser|
   parser.on(
     '-n', '--dry-run',
-    'Make no changes to git state (except to update remotes), and change some fatal errors to ' \
-    'warnings'
+    'Make no changes to git state, and change some fatal errors to warnings'
   ) do
     options[:dryrun] = true
   end
@@ -93,7 +92,7 @@ menu '[Y]es / [N]o' do |choice|
   end
 end
 
-unless system('git remote update > /dev/null 2>&1')
+unless options[:dryrun] || system('git remote update > /dev/null 2>&1')
   puts 'Failed to update remotes. (Connectivity problems?)'
   exit 1
 end
