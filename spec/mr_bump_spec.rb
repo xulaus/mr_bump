@@ -4,6 +4,7 @@
 
 require_relative 'spec_helper.rb'
 require 'mr_bump/version'
+require 'mr_bump/change'
 require 'mr_bump'
 
 describe MrBump do
@@ -425,6 +426,38 @@ describe MrBump do
 
       it 'correctly constucts uat branch name' do
         expect(MrBump.uat_branch).to eq('?v0.0.0+')
+      end
+    end
+  end
+
+  describe '#' do
+    let(:log) do
+      [
+        'Merge pull request #4 from mr_bump/hotfix/DEV-1261',
+        'Comment',
+        'Merge pull request #1376 from mr_bump/release/10.19.0',
+        'Comment',
+        'Over several',
+        'Lines',
+        'Merge pull request #1365 from mr_bump/revert_contact_fixes',
+        'Merge pull request #1365 from mr_bump/develop',
+        'Merge pull request #233 from mr_bump/bugfix/master',
+        'asdasd',
+        'Merge pull request #1336 from mr_bump/MDV-1261',
+        'wqefqfqefqwefqef'
+      ]
+    end
+    before(:each) { allow(MrBump).to receive(:merge_logs).and_return(log) }
+
+    context 'when given output from git log' do
+      let(:changes) { MrBump.change_log_items_for_range('', '') }
+
+      it 'converts raw git log ouput to changlog objects' do
+        expect(changes).to all(be_a(MrBump::Change))
+      end
+
+      it 'filters out release and master branch merges' do
+        expect(changes.map(&:branch_name)).to eq(['DEV-1261', 'revert_contact_fixes', 'MDV-1261'])
       end
     end
   end

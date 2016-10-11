@@ -89,14 +89,22 @@ module MrBump
   end
 
   def self.change_log_items_for_range(rev, head)
+    ignored_branch = Regexp.new("^(#{release_branch_regex}|master|develop)$")
+    make_change = lambda do |title, comment = []|
+      change = MrBump::Change.new(config_file, title, comment)
+      change unless ignored_branch.match(change.branch_name)
+    end
+
     chunked_log = merge_logs(rev, head).chunk { |change| change[/^Merge/].nil? }
     chunked_log.each_slice(2).map do |merge_str, comment|
       begin
-        MrBump::Change.new(config_file, merge_str[1][0], comment[1]).to_md
+        no_comment_changes = merge_str[1][0..-2].map(&make_change)
+        commented_changes = make_change.call(merge_str[1][-1], comment[1])
+        no_comment_changes.push(commented_changes)
       rescue ArgumentError => e
         puts e
       end
-    end.compact
+    end.flatten.compact
   end
 
   def self.file_prepend(file, str)

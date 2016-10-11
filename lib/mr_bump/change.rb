@@ -7,9 +7,10 @@ require 'mustache'
 module MrBump
   # This class acts parses merge information from a commit message string
   class Change
-    attr_reader :pr_number, :branch_type, :dev_id, :config, :comment_lines
+    attr_reader :pr_number, :branch_type, :dev_id, :config, :comment_lines, :branch_name
 
-    BRANCH_FMT = '((?<branch_type>bugfix|feature|hotfix)/)?(?<dev_id>\w+[-_]?\d+)?[\\w\\-_]+'.freeze
+    BRANCH_NAME_FMT = '(?<branch_name>(?<dev_id>\w+[-_]?\d+)?([\w\d\-_/\.])*)'.freeze
+    BRANCH_FMT = "((?<branch_type>bugfix|feature|hotfix)/)?#{BRANCH_NAME_FMT}".freeze
     MERGE_PR_FMT = "^Merge pull request #(?<pr_number>\\d+) from [\\w\\-_]+/#{BRANCH_FMT}".freeze
     MERGE_MANUAL_FMT = "^Merge branch '#{BRANCH_FMT}'".freeze
     MERGE_REGEX = Regexp.new(MERGE_PR_FMT + '|' + MERGE_MANUAL_FMT).freeze
@@ -20,6 +21,7 @@ module MrBump
                            "'#{commit_msg}'" unless matches
       @config = config
       @branch_type = (matches['branch_type'] || 'Task').capitalize
+      @branch_name = matches['branch_name']
       @dev_id = matches['dev_id'] || 'UNKNOWN'
       @pr_number = matches['pr_number'] || ''
       @comment_lines = Array(comment_lines)

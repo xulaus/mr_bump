@@ -125,7 +125,7 @@ end
 
 if release
   last_release = MrBump.current_uat
-  changes = MrBump.change_log_items_for_range(last_release, MrBump.uat_branch)
+  changes = MrBump.change_log_items_for_range(last_release, MrBump.uat_branch).map(&:to_md)
 else
   last_release = MrBump.current_master
   unless last_release
@@ -134,7 +134,7 @@ else
          "(#{MrBump.current_uat_major}) needs to exist"
     exit 1
   end
-  changes = MrBump.change_log_items_for_range(last_release, 'master')
+  changes = MrBump.change_log_items_for_range(last_release, 'master').map(&:to_md)
 end
 
 new_release = last_release.bump_patch
