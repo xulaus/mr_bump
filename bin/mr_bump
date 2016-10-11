@@ -9,7 +9,8 @@ require 'optparse'
 require 'mr_bump'
 require 'mr_bump/git_api'
 
-def menu(text, valid_options)
+def menu(text)
+  valid_options = text.scan(/\[(\w)\]/).flatten.uniq
   loop do
     print text + ': '
     choice = gets.chomp.upcase
@@ -34,6 +35,19 @@ OptionParser.new do |parser|
     options[:dryrun] = true
   end
 end.parse!
+
+head_tag = all_tags.select { |tag| tag.casecmp('HEAD').zero? }
+if head_tag
+  puts 'You have a tag called "HEAD". This interferes with both mr_bump and git.'
+  puts 'Would you like to remove it?'
+  menu '[F]ix and continue / [E]xit mr_bump' do |choice|
+    if choice == 'F'
+      `git tag -d #{head_tag}`
+    else
+      exit 1
+    end
+  end
+end
 
 release = MrBump.on_release_branch?
 master = MrBump.on_master_branch?
@@ -62,7 +76,7 @@ end
 puts 'Have you already closed your PR?'
 
 github_client = MrBump::GitApi.new(MrBump.config_file['github_api_token'])
-menu '[Y]es / [N]o', %w(Y N) do |choice|
+menu '[Y]es / [N]o' do |choice|
   if choice == 'N'
     puts 'Here are the 10 most recent PRs in your repo:'
     puts github_client.sorted_prs(MrBump.git_config.path)
@@ -99,7 +113,7 @@ unless MrBump.all_tagged_versions.include? MrBump.current_uat_major
   puts "Missing tag for version #{MrBump.current_uat_major}. Suggesting commit #{base_sha[0...8]}"
   puts "\t#{`git log --format="(%ci) %cn - %s" -n 1 #{base_sha}`}"
   puts 'Would you like to tag this commit?'
-  menu '[Y]es / [N]o', %w(Y N) do |choice|
+  menu '[Y]es / [N]o' do |choice|
     exit 1 if choice == 'N'
   end
   `git tag #{MrBump.current_uat_major} #{base_sha}`
@@ -117,7 +131,7 @@ else
   last_release = MrBump.current_master
   unless last_release
     puts "Couldn't detect the version of the master branch. " \
-         "At least one tagged version with version less than the current release version " \
+         'At least one tagged version with version less than the current release version ' \
          "(#{MrBump.current_uat_major}) needs to exist"
     exit 1
   end
@@ -133,7 +147,7 @@ puts '----------'
 puts md_changes
 puts '----------'
 
-menu '[A]ccept these changes / Manually [E]dit / [C]ancel Release', %w(A E C) do |choice|
+menu '[A]ccept these changes / Manually [E]dit / [C]ancel Release' do |choice|
   if choice == 'C'
     exit 1
   elsif choice == 'E'
@@ -148,7 +162,7 @@ menu '[A]ccept these changes / Manually [E]dit / [C]ancel Release', %w(A E C) do
     puts md_changes
     puts '----------'
 
-    menu '[A]ccept modified changes / [C]ancel Release', %w(A C) do |cancel|
+    menu '[A]ccept modified changes / [C]ancel Release' do |cancel|
       exit 1 if cancel == 'C'
     end
   end
@@ -173,7 +187,7 @@ bump_cmd_exists = config_file.key?('post_bump') &&
                   config_file['post_bump'].key?(branch_type)
 if bump_cmd_exists
   puts 'Would you like to execute post bump commands? '
-  menu '[Y]es execute / [N]o Im done', %w(Y N) do |choice|
+  menu '[Y]es execute / [N]o Im done' do |choice|
     if choice == 'Y'
       if options[:dryrun]
         puts "dry-run: `#{config_file['post_bump'][branch_type]}`"
