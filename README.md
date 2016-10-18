@@ -29,13 +29,11 @@ It is possible to have a different title, this can be done by changing the comme
 
 ## Running mr_bump
 
-Add the following to your Gemfile:
-
+mr_bump can be installed by running `gem install mr_bump`, or by adding the following to your `Gemfile`:
+```ruby
+gem 'mr_bump', require: false
 ```
-gem 'mr_bump', git: git@github.com:xulaus/mr_bump, require: false
-```
-
-Then run `bundle install`.
+and running `bundle install`.
 
 When you're ready to bump, switch to either the `release` or `master` branch and run `mr_bump` when you're in the repository root.
 
@@ -80,7 +78,7 @@ To accept the changes press <kbd>a</kbd> then press <kbd>Enter</kbd>, alternativ
 When you submit the changes, the `CHANGELOG.md` will be updated, commited and pushed and the commit will be tagged.
 
 If you wish to see what `mr_bump` would do without actually changing anything, you can use
-```
+```sh
 mr_bump --dry-run
 ```
 
@@ -94,7 +92,7 @@ Users can customise their own defaults by putting the relevent config option in 
 
 Mr Bump includes slack integration with a custom name and icon. To enable Slack integration add the following to your `.mr_bump` config file:
 
-```
+```yaml
 slack:
   webhook_url: "https://hooks.slack.com/services/some_custom_webhook"
   username: "Mr Bump"
@@ -107,7 +105,7 @@ If you do not wish to use Slack integration, remove the Slack section from your 
 
 Mr Bump can attatch Jira links to Slack posts. To enable this feature, simply add a Jira URL to the Mr Bump config file under `jira_url`:
 
-```
+```yaml
 slack:
   webhook_url: "https://hooks.slack.com/services/some_custom_webhook"
   username: "Mr Bump"
@@ -119,7 +117,7 @@ slack:
 
 Mr Bump allows post bump system commands for actions like deploys. These have to be included in your `.mr_bump` config file in the following format:
 
-```
+```yaml
 post_bump:
   release: "release deploy command"
   master: "master deploy command"
@@ -146,31 +144,30 @@ Your changelog can be customized by using the `markdown_template` configuration 
  * `comment_body`: The rest of the lines in the comment
 
 The default is:
-```
+```yaml
 markdown_template: " * {{branch_type}} - {{dev_id}} - {{first_comment_line}}{{#comment_body}}\n  {{.}}{{/comment_body}}"
 ```
 
-##Git token
+## Git token
 
 Mr Bump uses the Git Hub API. To do this you require a access token. The token should be stored in `~/.mr_bump.yml`.
 
 To generate your token follow the guide here: https://help.github.com/articles/creating-an-access-token-for-command-line-use/
 
-The git_token file should only contain the token and no new lines or additional text, eg:
+An example `~/.mr_bump.yml` file can be seen below
 
-```
->> cat ~/.mr_bump.yml
+```yaml
 github_api_token: 0d51e8dbc4802d27eebc913bc1e6844a57773076
 ```
 
 ## Customising release branch names
 Both user level and project level config options support two options for customisation of branch names, `release_prefix` and `release_suffix`. The default is:
-```
+```yaml
 release_prefix: release/
 release_suffix:
 ```
 This means `mr_bump` will look for branches in the form `release/0.0.0`. If for example, you would rather your "UAT" style branches were in the form `v0.0.0-testing`, you would set these varables to
-```
+```yaml
 release_prefix: v
 release_suffix: -testing
 ```
