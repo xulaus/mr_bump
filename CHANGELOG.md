@@ -1,9 +1,19 @@
+# 0.2.2
+* Fix documentation bug - [PR](https://github.com/xulaus/mr_bump/pull/47), [Issue](https://github.com/xulaus/mr_bump/issues/36)
+* Exit bump process if commit fails - [PR](https://github.com/xulaus/mr_bump/pull/46), [Issue](https://github.com/xulaus/mr_bump/issues/18)
+* Clearly show version being bumped from and to - [PR](https://github.com/xulaus/mr_bump/pull/46), [Issue](https://github.com/xulaus/mr_bump/issues/32)
+* Show user what the post bump command before running it - [PR](https://github.com/xulaus/mr_bump/pull/46), [Issue](https://github.com/xulaus/mr_bump/issues/33)
+* Add feature that ignores GitFlow branches - [PR](https://github.com/xulaus/mr_bump/pull/44), [Issue](https://github.com/xulaus/mr_bump/issues/43)
+* Do not update tags in dry run mode - [PR](https://github.com/xulaus/mr_bump/pull/35), [Issue](https://github.com/xulaus/mr_bump/issues/34)
+* Add warning when HEAD tag is detected - [PR](https://github.com/xulaus/mr_bump/pull/45), [Issue](https://github.com/xulaus/mr_bump/issues/41)
+* Improve testing and coverage - [PR 1](https://github.com/xulaus/mr_bump/pull/40), [PR 2](https://github.com/xulaus/mr_bump/pull/39)
+
 # 0.2.1
-* Fix crash when attempting to send Slack message [PR](https://github.com/xulaus/mr_bump/pull/#37)
+* Fix crash when attempting to send Slack message - [PR](https://github.com/xulaus/mr_bump/pull/#37)
 
 # 0.2.0
 * Fix error when trying to use `git merge-base` - [PR](https://github.com/xulaus/mr_bump/pull/28)
-* Add error when master version cannot be detected. - [PR](https://github.com/xulaus/mr_bump/pull/29)
+* Add error when master version cannot be detected - [PR](https://github.com/xulaus/mr_bump/pull/29)
 * Fix error on PR list load - [PR](https://github.com/xulaus/mr_bump/pull/30) [Issue](https://github.com/xulaus/mr_bump/pull/24) 
 * Make release branch name configurable - [PR](https://github.com/xulaus/mr_bump/pull/25)
 * Code Cleanup - [PR](https://github.com/xulaus/mr_bump/pull/15)
