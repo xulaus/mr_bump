@@ -13,7 +13,7 @@ def menu(text)
   valid_options = text.scan(/\[(\w)\]/).flatten.uniq
   loop do
     print text + ': '
-    choice = gets.chomp.upcase
+    choice = STDIN.gets.chomp.upcase
     if valid_options.include? choice
       yield(choice)
       break
@@ -23,25 +23,35 @@ def menu(text)
   end
 end
 
-options = {
-  dryrun: false
-}
-OptionParser.new do |parser|
-  parser.on(
-    '-n', '--dry-run',
-    'Make no changes to git state, and change some fatal errors to warnings'
-  ) do
-    options[:dryrun] = true
+def options
+  @options ||= begin
+    dict = { dryrun: false }
+    OptionParser.new do |parser|
+      parser.on('-n', '--dry-run',
+                'Make no changes to git state, and change some fatal errors to warnings') do
+        dict[:dryrun] = true
+      end
+    end.parse!
+    dict.freeze
   end
-end.parse!
+end
 
-head_tag = all_tags.select { |tag| tag.casecmp('HEAD').zero? }
+def run(cmd)
+  if options[:dryrun]
+    puts "dry-run: `#{cmd}`"
+    return true
+  else
+    system(cmd)
+  end
+end
+
+head_tag = MrBump.all_tags.detect { |tag| tag.casecmp('HEAD').zero? }
 if head_tag
   puts 'You have a tag called "HEAD". This interferes with both mr_bump and git.'
   puts 'Would you like to remove it?'
   menu '[F]ix and continue / [E]xit mr_bump' do |choice|
     if choice == 'F'
-      `git tag -d #{head_tag}`
+      run("git tag -d #{head_tag}")
     else
       exit 1
     end
@@ -98,12 +108,8 @@ unless options[:dryrun] || system('git remote update > /dev/null 2>&1')
 end
 
 unless `git rev-parse @` == `git rev-parse @{u}`
-  if options[:dryrun]
-    puts 'WARNING! Not up to date with origin! Please run git pull'
-  else
-    puts 'Not up to date with origin! Please run git pull'
-    exit 1
-  end
+  puts 'Not up to date with origin! Please run git pull'
+  exit 1 unless options[:dryrun]
 end
 
 unless MrBump.all_tagged_versions.include? MrBump.current_uat_major
@@ -115,7 +121,7 @@ unless MrBump.all_tagged_versions.include? MrBump.current_uat_major
   menu '[Y]es / [N]o' do |choice|
     exit 1 if choice == 'N'
   end
-  `git tag #{MrBump.current_uat_major} #{base_sha}`
+  run("git tag #{MrBump.current_uat_major} #{base_sha}")
 end
 
 unless File.file?(changelog)
@@ -141,6 +147,8 @@ new_release = last_release.bump_patch
 changes = changes.join("\n")
 md_changes = "# #{new_release}\n#{changes}\n\n"
 
+puts "You are bumping from version '#{last_release}' to '#{new_release}'"
+puts ''
 puts 'Changelog additions'
 puts '----------'
 puts md_changes
@@ -169,30 +177,22 @@ menu '[A]ccept these changes / Manually [E]dit / [C]ancel Release' do |choice|
   MrBump.file_prepend(changelog, md_changes) unless options[:dryrun]
 end
 
-if options[:dryrun]
-  puts "dry-run: `git commit -m 'Bump version to #{new_release}' -- #{changelog}`"
-  puts "dry-run: `git tag #{new_release}`"
-  puts 'dry-run: git push && git push --tags`'
-else
-  `git commit -m 'Bump version to #{new_release}' -- #{changelog}`
-  `git tag #{new_release}`
-  `git push && git push --tags`
-  MrBump.slack_notifier(new_release, changes)
-end
+if run("git commit -m 'Bump version to #{new_release}' -- #{changelog}") &&
+   run("git tag #{new_release}") &&
+   run('git push && git push --tags')
+  MrBump.slack_notifier(new_release, changes) unless options[:dryrun]
 
-config_file = MrBump.config_file()
-branch_type = release ? 'release' : 'master'
-bump_cmd_exists = config_file.key?('post_bump') &&
-                  config_file['post_bump'].key?(branch_type)
-if bump_cmd_exists
-  puts 'Would you like to execute post bump commands? '
-  menu '[Y]es execute / [N]o Im done' do |choice|
-    if choice == 'Y'
-      if options[:dryrun]
-        puts "dry-run: `#{config_file['post_bump'][branch_type]}`"
-      else
-        system(config_file['post_bump'][branch_type])
-      end
+  config_file = MrBump.config_file()
+  branch_type = release ? 'release' : 'master'
+  bump_cmd = config_file.fetch('post_bump', {}).fetch(branch_type, '')
+  unless bump_cmd.empty?
+    puts 'Would you like to execute the following post bump commands?'
+    puts "  #{bump_cmd}"
+    menu '[Y]es execute / [N]o Im done' do |choice|
+      run(bump_cmd) if choice == 'Y'
     end
   end
+else
+  puts "Bump Failed :'("
+  exit 1
 end
