@@ -11,8 +11,7 @@ require 'mr_bump/change'
 # Add helper functions to the MrBump namespace
 module MrBump
   def self.current_branch
-    @current_branch ||= `git rev-parse --abbrev-ref HEAD`
-    @current_branch.strip
+    @current_branch ||= `git rev-parse --abbrev-ref HEAD`.strip.freeze
   end
 
   def self.release_branch_regex
@@ -77,15 +76,6 @@ module MrBump
               "'(^Merge pull request | into #{current_branch}$)' --merges -E"
     log = `#{git_cmd} #{rev}..#{head}`
     log.each_line.map(&:strip).select { |str| !(str.nil? || str == '' || str[0] == '#') }
-  end
-
-  def self.ignored_merges_regex
-    @ignored_merges_regex ||= begin
-      ignored_branch = '(release|master|develop)'
-      regex_pr = "^Merge pull request #\\d+ from Intellection/#{ignored_branch}"
-      regex_manual = "^Merge branch '?#{ignored_branch}"
-      Regexp.new("#{regex_pr}|#{regex_manual}")
-    end
   end
 
   def self.change_log_items_for_range(rev, head)

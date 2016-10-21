@@ -461,4 +461,22 @@ describe MrBump do
       end
     end
   end
+
+  describe '#file_prepend' do
+    it 'prepends to files' do
+      file = 'filename.md'
+      before = 'String before'
+      prepend_str = 'Sting to prepend. '
+      after = prepend_str + before
+
+      read_buffer = StringIO.new before
+      write_buffer = StringIO.new
+
+      allow(File).to receive(:open).with(file, 'r').and_yield(read_buffer)
+      allow(File).to receive(:open).with(file, 'w').and_yield(write_buffer)
+
+      MrBump.file_prepend(file, prepend_str)
+      expect(write_buffer.string).to eq(after)
+    end
+  end
 end
