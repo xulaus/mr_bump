@@ -20,6 +20,12 @@ module MrBump
     "#{prefix}(\\d+\\.\\d+)(\\.\\d+)?#{suffix}"
   end
 
+  def self.release_branch_for_version(ver)
+    prefix = config_file['release_prefix']
+    suffix = config_file['release_suffix']
+    "#{prefix}#{ver.major}.#{ver.minor}.0#{suffix}"
+  end
+
   def self.on_release_branch?
     regex = Regexp.new("^#{release_branch_regex}$")
     !MrBump.current_branch[regex].nil?
@@ -29,8 +35,31 @@ module MrBump
     !MrBump.current_branch[/^master$/].nil?
   end
 
+  def self.on_develop_branch?
+    !MrBump.current_branch[/^develop$/].nil?
+  end
+
   def self.release_stale?
     !`git branch master --contains #{MrBump.current_uat_major}`.strip.empty?
+  end
+
+  def self.last_release
+    if on_release_branch? || (on_master_branch? && release_stale?)
+      MrBump.current_uat
+    elsif on_master_branch?
+      MrBump.current_master
+    elsif on_develop_branch?
+      MrBump.current_uat_major
+    end
+  end
+
+  def self.next_release
+    return nil unless last_release
+    if on_release_branch? || on_master_branch?
+      last_release.bump_patch
+    elsif on_develop_branch?
+      last_release.bump_minor
+    end
   end
 
   def self.latest_release_from_list(branches)
@@ -47,8 +76,7 @@ module MrBump
   end
 
   def self.uat_branch
-    config = MrBump.config_file
-    "#{config['release_prefix']}#{current_uat_major}#{config['release_suffix']}"
+    release_branch_for_version(current_uat_major)
   end
 
   def self.all_tags

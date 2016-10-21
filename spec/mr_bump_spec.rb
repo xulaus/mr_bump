@@ -317,6 +317,58 @@ describe MrBump do
         expect(MrBump.on_master_branch?).to eq(false)
       end
     end
+
+    context 'when on a branch called develop' do
+      let(:current_branch) { 'develop' }
+
+      it 'returns false' do
+        expect(MrBump.on_master_branch?).to eq(false)
+      end
+    end
+  end
+
+  describe '#on_develop_branch?' do
+    before(:each) { allow(MrBump).to receive(:current_branch).and_return(current_branch) }
+
+    context 'when on a branch called develop' do
+      let(:current_branch) { 'develop' }
+
+      it 'returns true' do
+        expect(MrBump.on_develop_branch?).to eq(true)
+      end
+    end
+
+    context 'when on a branch called develop$' do
+      let(:current_branch) { 'develop$' }
+
+      it 'returns false' do
+        expect(MrBump.on_develop_branch?).to eq(false)
+      end
+    end
+
+    context 'when on a branch called ^develop' do
+      let(:current_branch) { '^develop' }
+
+      it 'returns false' do
+        expect(MrBump.on_develop_branch?).to eq(false)
+      end
+    end
+
+    context 'when on a branch called release' do
+      let(:current_branch) { 'release' }
+
+      it 'returns false' do
+        expect(MrBump.on_develop_branch?).to eq(false)
+      end
+    end
+
+    context 'when on a branch called master' do
+      let(:current_branch) { 'master' }
+
+      it 'returns false' do
+        expect(MrBump.on_develop_branch?).to eq(false)
+      end
+    end
   end
 
   describe '#on_release_branch?' do
@@ -359,6 +411,14 @@ describe MrBump do
 
         it 'returns true' do
           expect(MrBump.on_release_branch?).to eq(true)
+        end
+      end
+
+      context 'when on a branch called develop' do
+        let(:current_branch) { 'develop' }
+
+        it 'returns false' do
+          expect(MrBump.on_master_branch?).to eq(false)
         end
       end
     end
@@ -430,7 +490,7 @@ describe MrBump do
     end
   end
 
-  describe '#' do
+  describe '#change_log_items_for_range' do
     let(:log) do
       [
         'Merge pull request #4 from mr_bump/hotfix/DEV-1261',
@@ -458,6 +518,127 @@ describe MrBump do
 
       it 'filters out release and master branch merges' do
         expect(changes.map(&:branch_name)).to eq(['DEV-1261', 'revert_contact_fixes', 'MDV-1261'])
+      end
+    end
+  end
+
+  describe '#last_release' do
+    before do
+      allow(MrBump).to receive(:current_uat).and_return(MrBump::Version.new('0.1.3'))
+      allow(MrBump).to receive(:current_uat_major).and_return(MrBump::Version.new('0.1.0'))
+      allow(MrBump).to receive(:current_master).and_return(MrBump::Version.new('0.0.1'))
+    end
+
+    context 'when on master branch' do
+      before do
+        allow(MrBump).to receive(:on_master_branch?).and_return(true)
+        allow(MrBump).to receive(:on_release_branch?).and_return(false)
+        allow(MrBump).to receive(:on_develop_branch?).and_return(false)
+        allow(MrBump).to receive(:release_stale?).and_return(false)
+      end
+
+      it 'returns the master version' do
+        expect(MrBump.last_release).to eq(MrBump::Version.new('0.0.1'))
+      end
+    end
+
+    context 'when on master with stale release branch' do
+      before do
+        allow(MrBump).to receive(:on_master_branch?).and_return(true)
+        allow(MrBump).to receive(:on_release_branch?).and_return(false)
+        allow(MrBump).to receive(:on_develop_branch?).and_return(false)
+        allow(MrBump).to receive(:release_stale?).and_return(true)
+      end
+
+      it 'returns the master version' do
+        expect(MrBump.last_release).to eq(MrBump::Version.new('0.1.3'))
+      end
+    end
+
+    context 'when on release branch' do
+      before do
+        allow(MrBump).to receive(:on_master_branch?).and_return(false)
+        allow(MrBump).to receive(:on_release_branch?).and_return(true)
+        allow(MrBump).to receive(:on_develop_branch?).and_return(false)
+        allow(MrBump).to receive(:release_stale?).and_return(false)
+      end
+
+      it 'returns the release version' do
+        expect(MrBump.last_release).to eq(MrBump::Version.new('0.1.3'))
+      end
+    end
+
+
+    context 'when on develop branch' do
+      before do
+        allow(MrBump).to receive(:on_master_branch?).and_return(false)
+        allow(MrBump).to receive(:on_release_branch?).and_return(false)
+        allow(MrBump).to receive(:on_develop_branch?).and_return(true)
+        allow(MrBump).to receive(:release_stale?).and_return(false)
+      end
+
+      it 'returns the last release version' do
+        expect(MrBump.last_release).to eq(MrBump::Version.new('0.1.0'))
+      end
+    end
+  end
+
+  describe '#next_release' do
+    before do
+      allow(MrBump).to receive(:current_uat).and_return(MrBump::Version.new('0.1.3'))
+      allow(MrBump).to receive(:current_uat_major).and_return(MrBump::Version.new('0.1.0'))
+      allow(MrBump).to receive(:current_master).and_return(MrBump::Version.new('0.0.1'))
+    end
+
+    context 'when on master branch' do
+      before do
+        allow(MrBump).to receive(:on_master_branch?).and_return(true)
+        allow(MrBump).to receive(:on_release_branch?).and_return(false)
+        allow(MrBump).to receive(:on_develop_branch?).and_return(false)
+        allow(MrBump).to receive(:release_stale?).and_return(false)
+      end
+
+      it 'returns the master version + a patch' do
+        expect(MrBump.next_release).to eq(MrBump::Version.new('0.0.2'))
+      end
+    end
+
+    context 'when on master with stale release branch' do
+      before do
+        allow(MrBump).to receive(:on_master_branch?).and_return(true)
+        allow(MrBump).to receive(:on_release_branch?).and_return(false)
+        allow(MrBump).to receive(:on_develop_branch?).and_return(false)
+        allow(MrBump).to receive(:release_stale?).and_return(true)
+      end
+
+      it 'returns the release version' do
+        expect(MrBump.next_release).to eq(MrBump::Version.new('0.1.4'))
+      end
+    end
+
+    context 'when on release branch' do
+      before do
+        allow(MrBump).to receive(:on_master_branch?).and_return(false)
+        allow(MrBump).to receive(:on_release_branch?).and_return(true)
+        allow(MrBump).to receive(:on_develop_branch?).and_return(false)
+        allow(MrBump).to receive(:release_stale?).and_return(false)
+      end
+
+      it 'returns the release version' do
+        expect(MrBump.next_release).to eq(MrBump::Version.new('0.1.4'))
+      end
+    end
+
+    context 'when on develop branch' do
+      before do
+        allow(MrBump).to receive(:on_master_branch?).and_return(false)
+        allow(MrBump).to receive(:on_release_branch?).and_return(false)
+        allow(MrBump).to receive(:on_develop_branch?).and_return(true)
+        allow(MrBump).to receive(:release_stale?).and_return(false)
+      end
+
+      it 'returns the release version plus a minor' do
+        expect(MrBump.next_release).to eq(MrBump::Version.new('0.2.0'))
       end
     end
   end

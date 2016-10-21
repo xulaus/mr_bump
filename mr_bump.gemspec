@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name               = 'mr_bump'
   s.version            = '0.2.2'
-  s.licenses           = ['MPL 2.0']
+  s.licenses           = ['MPL-2.0']
   s.default_executable = 'mr_bump'
   s.executables        = ['mr_bump']
 

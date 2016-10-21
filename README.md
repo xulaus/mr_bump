@@ -28,6 +28,7 @@ The pull request title should just contain a description of the work undertaken.
 It is possible to have a different title, this can be done by changing the comment on the merge commit.
 
 ## Running mr_bump
+### Bugfixes and Hotfixes
 
 mr_bump can be installed by running `gem install mr_bump`, or by adding the following to your `Gemfile`:
 ```ruby
@@ -82,6 +83,17 @@ If you wish to see what `mr_bump` would do without actually changing anything, y
 mr_bump --dry-run
 ```
 
+### Cutting a new release
+
+To cut a new release, switch to the develop branch and run `mr_bump`. You will be shown something similar to the following:
+```
+You are about to cut a release branch. If you are sure you want to do this type: 
+      release/1.2.0
+Here:
+```
+
+Asides from the additional confirmation, the rest of the procedure is the same as for a hotfix.
+
 ## Config File
 
 The config file should be stored in the root directory of the repository under the name `.mr_bump`. The config file is a yaml file which contains configurations for Mr Bump.
@@ -121,12 +133,16 @@ Mr Bump allows post bump system commands for actions like deploys. These have to
 post_bump:
   release: "release deploy command"
   master: "master deploy command"
+  develop: "post release develop command"
 ```
+
+It is important to note that when cutting a new release, both the `release` and `develop` commands will be run.
 
 If you have post bump commands in your config then once you have pushed your changelog and tagged, you will be prompted as follows:
 
 ```
-Would you like to execute post bump commands?
+Would you like to execute the following post bump commands?
+  command
 [Y]es execute / [N]o Im done : y
 ```
 

@@ -60,15 +60,16 @@ end
 
 release = MrBump.on_release_branch?
 master = MrBump.on_master_branch?
+develop = MrBump.on_develop_branch?
 
 changelog = "#{`git rev-parse --show-toplevel`.strip}/CHANGELOG.md"
 
-unless release || master
+unless release || master || develop
   puts 'Need to be on either release or master branch'
   exit 1
 end
 
-unless master || MrBump.current_branch.to_s == MrBump.uat_branch
+unless master || develop || MrBump.current_branch.to_s == MrBump.uat_branch
   puts "On release branch '#{MrBump.current_branch}'. " \
        "Expected release branch '#{MrBump.uat_branch}'"
   exit 1
@@ -82,22 +83,24 @@ unless MrBump.config_file['github_api_token']
   exit 1
 end
 
-puts 'Have you already closed your PR?'
+unless develop
+  puts 'Have you already closed your PR?'
 
-github_client = MrBump::GitApi.new(MrBump.config_file['github_api_token'])
-menu '[Y]es / [N]o' do |choice|
-  if choice == 'N'
-    puts 'Here are the 10 most recent PRs in your repo:'
-    puts github_client.sorted_prs(MrBump.git_config.path)
-    loop do
-      print 'Enter the PR number to merge : '
-      pr_id = gets.chomp
-      if options[:dryrun]
-        puts "dryrun: Would merge ##{pr_id}"
-      else
-        github_client.merge_pr(MrBump.git_config.path, pr_id)
+  github_client = MrBump::GitApi.new(MrBump.config_file['github_api_token'])
+  menu '[Y]es / [N]o' do |choice|
+    if choice == 'N'
+      puts 'Here are the 10 most recent PRs in your repo:'
+      puts github_client.sorted_prs(MrBump.git_config.path)
+      loop do
+        print 'Enter the PR number to merge : '
+        pr_id = gets.chomp
+        if options[:dryrun]
+          puts "dryrun: Would merge ##{pr_id}"
+        else
+          github_client.merge_pr(MrBump.git_config.path, pr_id)
+        end
+        break
       end
-      break
     end
   end
 end
@@ -129,35 +132,40 @@ unless File.file?(changelog)
   exit 1
 end
 
-if release
-  if MrBump.release_stale?
+if MrBump.release_stale?
+  if release
     puts 'Error: Master branch contains commits from the release branch.'
     puts 'This means the release branch has been merged, and a new release branch needs to be made.'
     puts 'Unable to continue on old release branch.'
     exit 1
+  elsif master
+    puts 'WARNING: Master branch contains commits from the release branch.'
   end
+end
 
-  last_release = MrBump.current_uat
-  changes = MrBump.change_log_items_for_range(last_release, MrBump.uat_branch).map(&:to_md)
-else
-  last_release = MrBump.current_master
-
-  unless last_release
+last_release = MrBump.last_release
+unless last_release
+  if master
     puts "Couldn't detect the version of the master branch. " \
          'At least one tagged version with version less than the current release version ' \
          "(#{MrBump.current_uat_major}) needs to exist"
-    exit 1
+  else
+    puts "Couldn't detect the version of this branch. "
   end
-
-  if MrBump.release_stale?
-    last_release = MrBump.current_uat
-    puts 'WARNING: Master branch contains commits from the release branch.'
-  end
-
-  changes = MrBump.change_log_items_for_range(last_release, 'master').map(&:to_md)
+  exit 1
 end
 
-new_release = last_release.bump_patch
+new_release = MrBump.next_release
+if develop
+  new_branch = MrBump.release_branch_for_version(new_release)
+  print "You are about to cut a release branch. If you are sure you want to do this type: \n" \
+        "      #{new_branch}\n" \
+        'Here: '
+  user_inp = STDIN.readline
+  exit 1 unless user_inp.strip == new_branch
+end
+
+changes = MrBump.change_log_items_for_range(last_release, MrBump.current_branch).map(&:to_md)
 changes = changes.join("\n")
 md_changes = "# #{new_release}\n#{changes}\n\n"
 
@@ -193,17 +201,22 @@ end
 
 if run("git commit -m 'Bump version to #{new_release}' -- #{changelog}") &&
    run("git tag #{new_release}") &&
-   run('git push && git push --tags')
+   run('git push && git push --tags') &&
+   (!develop || run("git checkout -b #{new_branch} && git push origin #{new_branch}"))
   MrBump.slack_notifier(new_release, changes) unless options[:dryrun]
 
-  config_file = MrBump.config_file()
-  branch_type = release ? 'release' : 'master'
-  bump_cmd = config_file.fetch('post_bump', {}).fetch(branch_type, '')
-  unless bump_cmd.empty?
+  branch_type = master ? 'master' : 'release'
+  post_bump = MrBump.config_file.fetch('post_bump', {})
+  bump_cmds = [
+    develop ? post_bump['develop'] : nil,
+    post_bump[branch_type]
+  ].compact
+
+  unless bump_cmds.empty?
     puts 'Would you like to execute the following post bump commands?'
-    puts "  #{bump_cmd}"
+    bump_cmds.each.each { |cmd| puts "  #{cmd}" }
     menu '[Y]es execute / [N]o Im done' do |choice|
-      run(bump_cmd) if choice == 'Y'
+      bump_cmds.each { |cmd| run(cmd) } if choice == 'Y'
     end
   end
 else
