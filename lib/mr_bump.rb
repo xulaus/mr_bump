@@ -29,6 +29,10 @@ module MrBump
     !MrBump.current_branch[/^master$/].nil?
   end
 
+  def self.release_stale?
+    !`git branch master --contains #{MrBump.current_uat_major}`.strip.empty?
+  end
+
   def self.latest_release_from_list(branches)
     regex = Regexp.new("^origin/#{release_branch_regex}$")
     branches.map do |branch|

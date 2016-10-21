@@ -130,16 +130,30 @@ unless File.file?(changelog)
 end
 
 if release
+  if MrBump.release_stale?
+    puts 'Error: Master branch contains commits from the release branch.'
+    puts 'This means the release branch has been merged, and a new release branch needs to be made.'
+    puts 'Unable to continue on old release branch.'
+    exit 1
+  end
+
   last_release = MrBump.current_uat
   changes = MrBump.change_log_items_for_range(last_release, MrBump.uat_branch).map(&:to_md)
 else
   last_release = MrBump.current_master
+
   unless last_release
     puts "Couldn't detect the version of the master branch. " \
          'At least one tagged version with version less than the current release version ' \
          "(#{MrBump.current_uat_major}) needs to exist"
     exit 1
   end
+
+  if MrBump.release_stale?
+    last_release = MrBump.current_uat
+    puts 'WARNING: Master branch contains commits from the release branch.'
+  end
+
   changes = MrBump.change_log_items_for_range(last_release, 'master').map(&:to_md)
 end
 
