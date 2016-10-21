@@ -1,3 +1,8 @@
+# 0.3.0
+* Allow mr_bump to cut new releases - [PR](https://github.com/xulaus/mr_bump/pull/51)
+* Add warning for stale release branch - [PR](https://github.com/xulaus/mr_bump/pull/49), [Issue](https://github.com/xulaus/mr_bump/issues/42)
+* Better Test Coverage - [PR](https://github.com/xulaus/mr_bump/pull/50)
+
 # 0.2.2
 * Fix documentation bug - [PR](https://github.com/xulaus/mr_bump/pull/47), [Issue](https://github.com/xulaus/mr_bump/issues/36)
 * Exit bump process if commit fails - [PR](https://github.com/xulaus/mr_bump/pull/46), [Issue](https://github.com/xulaus/mr_bump/issues/18)
