@@ -216,11 +216,11 @@ if run("git commit -m 'Bump version to #{new_release}' -- #{changelog}") &&
   bump_cmds = [
     develop ? post_bump['develop'] : nil,
     post_bump[branch_type]
-  ].compact
+  ].flatten.compact
 
   unless bump_cmds.empty?
     puts 'Would you like to execute the following post bump commands?'
-    bump_cmds.each.each { |cmd| puts "  #{cmd}" }
+    bump_cmds.each { |cmd| puts "  #{cmd}" }
     menu '[Y]es execute / [N]o Im done' do |choice|
       bump_cmds.each { |cmd| run(cmd) } if choice == 'Y'
     end
