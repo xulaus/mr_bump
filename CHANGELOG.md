@@ -1,6 +1,10 @@
+# 0.3.2
+* Fix bug where multiple post bump commands would fail to execute - [PR](https://github.com/xulaus/mr_bump/pull/58)
+* Update gemspec to remain ruby 1.9.3 compatabile - [PR](https://github.com/xulaus/mr_bump/pull/57)
+
 # 0.3.1
 * Fix small bug where new release branches are not pushed after cutting new release - [PR](https://github.com/xulaus/mr_bump/pull/54)
-* Use Git Editor for editing changelogs when set in either config or environment variable - [PR](https://github.com/xulaus/mr_bump/pull/5#55)
+* Use Git Editor for editing changelogs when set in either config or environment variable - [PR](https://github.com/xulaus/mr_bump/pull/55)
 
 # 0.3.0
 * Allow mr_bump to cut new releases - [PR](https://github.com/xulaus/mr_bump/pull/51)
