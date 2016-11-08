@@ -1,3 +1,7 @@
+# 0.3.1
+* Fix small bug where new release branches are not pushed after cutting new release - [PR](https://github.com/xulaus/mr_bump/pull/54)
+* Use Git Editor for editing changelogs when set in either config or environment variable - [PR](https://github.com/xulaus/mr_bump/pull/5#55)
+
 # 0.3.0
 * Allow mr_bump to cut new releases - [PR](https://github.com/xulaus/mr_bump/pull/51)
 * Add warning for stale release branch - [PR](https://github.com/xulaus/mr_bump/pull/49), [Issue](https://github.com/xulaus/mr_bump/issues/42)

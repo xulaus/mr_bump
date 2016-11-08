@@ -66,7 +66,7 @@ Changelog:
 
 You can now review the changes. If you are happy with the changes type <kbd>a</kbd> and press <kbd>Enter</kbd>.
 
-If you wish to make manual changes to the output, type <kbd>e</kbd> and press <kbd>Enter</kbd>. This will update your `CHANGELOG.md` and drop you into a nano editor to make modifications to the `CHANGELOG.md`. Make the required modifications and exit nano using the usual commands.
+If you wish to make manual changes to the output, type <kbd>e</kbd> and press <kbd>Enter</kbd>. This will update your `CHANGELOG.md` and drop you into your git editor, or nano by default, so that you can make modifications. Make the required modifications, and exit your editor.
 
 When you have finished editing you will be able to review your changes and be presented with the following options:
 
