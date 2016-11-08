@@ -23,6 +23,12 @@ def menu(text)
   end
 end
 
+def editor
+  edit = `git config core.editor`.strip
+  edit =  ENV['GIT_EDITOR'] if edit.empty?
+  edit || 'nano'
+end
+
 def options
   @options ||= begin
     dict = { dryrun: false }
@@ -183,7 +189,7 @@ menu '[A]ccept these changes / Manually [E]dit / [C]ancel Release' do |choice|
     tempfile = Tempfile.new('CHANGELOG')
     tempfile.write(changes)
     tempfile.close
-    system "nano #{tempfile.path}"
+    system "#{editor} #{tempfile.path}"
     changes = File.open(tempfile.path, 'r').read.rstrip
     md_changes = "# #{new_release}\n#{changes}\n\n"
     puts 'Modified Changelog additions'
