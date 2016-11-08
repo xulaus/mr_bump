@@ -202,7 +202,7 @@ end
 if run("git commit -m 'Bump version to #{new_release}' -- #{changelog}") &&
    run("git tag #{new_release}") &&
    run('git push && git push --tags') &&
-   (!develop || run("git checkout -b #{new_branch} && git push origin #{new_branch}"))
+   (!develop || run("git checkout -b #{new_branch} && git push --set-upstream origin #{new_branch}"))
   MrBump.slack_notifier(new_release, changes) unless options[:dryrun]
 
   branch_type = master ? 'master' : 'release'
