@@ -121,7 +121,7 @@ module MrBump
     chunked_log.each_slice(2).map do |merge_str, comment|
       begin
         no_comment_changes = merge_str[1][0..-2].map(&make_change)
-        commented_changes = make_change.call(merge_str[1][-1], comment[1])
+        commented_changes = make_change.call(merge_str[1][-1], comment.nil? ? [] : comment[1])
         no_comment_changes.push(commented_changes)
       rescue ArgumentError => e
         puts e

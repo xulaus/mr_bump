@@ -520,6 +520,18 @@ describe MrBump do
         expect(changes.map(&:branch_name)).to eq(['DEV-1261', 'revert_contact_fixes', 'MDV-1261'])
       end
     end
+
+    context 'when given a git log with one item and no comment' do
+      let(:log) do
+        [
+          'Merge pull request #4 from mr_bump/hotfix/DEV-1261'
+        ]
+      end
+      let(:changes) { MrBump.change_log_items_for_range('', '') }
+      it 'converts raw git log ouput to changlog objects' do
+        expect(changes).to all(be_a(MrBump::Change))
+      end
+    end
   end
 
   describe '#last_release' do
