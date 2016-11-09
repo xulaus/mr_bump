@@ -1,3 +1,6 @@
+# 0.3.3
+* Fix crash when there is only a single merge item and no comment - [PR](https://github.com/xulaus/mr_bump/pull/62), [Issue](https://github.com/xulaus/mr_bump/issues/60)
+
 # 0.3.2
 * Fix bug where multiple post bump commands would fail to execute - [PR](https://github.com/xulaus/mr_bump/pull/58)
 * Update gemspec to remain ruby 1.9.3 compatabile - [PR](https://github.com/xulaus/mr_bump/pull/57)
