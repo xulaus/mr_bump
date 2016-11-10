@@ -25,6 +25,11 @@ module MrBump
       @dev_id = matches['dev_id'] || 'UNKNOWN'
       @pr_number = matches['pr_number'] || ''
       @comment_lines = Array(comment_lines)
+      unless @comment_lines.empty? || @dev_id == 'UNKNOWN'
+        id = Regexp.escape(@dev_id)
+        prefix_regex = /^(\[#{id}\]|\(#{id}\)|#{id})\s*([:\-]\s*)?/
+        @comment_lines[0] = @comment_lines[0].sub(prefix_regex, '')
+      end
     end
 
     def first_comment_line

@@ -273,4 +273,76 @@ describe MrBump::Change do
       expect(change.to_md).to eq(" * Task - UNKNOWN - Line 1\n  Line 2")
     end
   end
+
+  context 'when given a change prefixed with a DevID seperated with a colon' do
+    let(:merge_str) { "Merge branch 'hotfix/DEV-1_Stuff'" }
+    let(:change) { described_class.new(config, merge_str, ['DEV-1: Line 1', 'Line 2']) }
+
+    it 'removes the DevID and renders to markdown correctly' do
+      expect(change.to_md).to eq(" * Hotfix - DEV-1 - Line 1\n  Line 2")
+    end
+  end
+
+  context 'when given a change prefixed with a DevID seperated with a dash' do
+    let(:merge_str) { "Merge branch 'hotfix/DEV-1_Stuff'" }
+    let(:change) { described_class.new(config, merge_str, ['DEV-1 - Line 1', 'Line 2']) }
+
+    it 'removes the DevID and renders to markdown correctly' do
+      expect(change.to_md).to eq(" * Hotfix - DEV-1 - Line 1\n  Line 2")
+    end
+  end
+
+  context 'when given a change prefixed with a DevID seperated with a dash, and in square braces' do
+    let(:merge_str) { "Merge branch 'hotfix/DEV-1_Stuff'" }
+    let(:change) { described_class.new(config, merge_str, ['[DEV-1] - Line 1', 'Line 2']) }
+
+    it 'removes the DevID and renders to markdown correctly' do
+      expect(change.to_md).to eq(" * Hotfix - DEV-1 - Line 1\n  Line 2")
+    end
+  end
+
+  context 'when given a change prefixed with a DevID in square braces' do
+    let(:merge_str) { "Merge branch 'hotfix/DEV-1_Stuff'" }
+    let(:change) { described_class.new(config, merge_str, ['[DEV-1] Line 1', 'Line 2']) }
+
+    it 'removes the DevID and renders to markdown correctly' do
+      expect(change.to_md).to eq(" * Hotfix - DEV-1 - Line 1\n  Line 2")
+    end
+  end
+
+  context 'when given a change prefixed with a DevID in round braces' do
+    let(:merge_str) { "Merge branch 'hotfix/DEV-1_Stuff'" }
+    let(:change) { described_class.new(config, merge_str, ['(DEV-1) Line 1', 'Line 2']) }
+
+    it 'removes the DevID and renders to markdown correctly' do
+      expect(change.to_md).to eq(" * Hotfix - DEV-1 - Line 1\n  Line 2")
+    end
+  end
+
+  context 'when given a change prefixed with a DevID seperated by space only' do
+    let(:merge_str) { "Merge branch 'hotfix/DEV-1_Stuff'" }
+    let(:change) { described_class.new(config, merge_str, ['DEV-1 Line 1', 'Line 2']) }
+
+    it 'leaves the DevID and renders to markdown correctly' do
+      expect(change.to_md).to eq(" * Hotfix - DEV-1 - Line 1\n  Line 2")
+    end
+  end
+
+  context 'when given a change postfixed with a DevID in round braces' do
+    let(:merge_str) { "Merge branch 'hotfix/DEV-1_Stuff'" }
+    let(:change) { described_class.new(config, merge_str, ['Line 1 (DEV-1)', 'Line 2']) }
+
+    it 'leaves the DevID and renders to markdown correctly' do
+      expect(change.to_md).to eq(" * Hotfix - DEV-1 - Line 1 (DEV-1)\n  Line 2")
+    end
+  end
+
+  context 'when given a change with no description' do
+    let(:merge_str) { "Merge branch 'hotfix/DEV-1_Stuff'" }
+    let(:change) { described_class.new(config, merge_str, []) }
+
+    it 'renders to markdown correctly' do
+      expect(change.to_md).to eq(" * Hotfix - DEV-1 - ")
+    end
+  end
 end
