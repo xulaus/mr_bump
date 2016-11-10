@@ -1,3 +1,6 @@
+# 0.3.4
+* Strip DevIDs from the beginning of change log comments - [PR](https://github.com/xulaus/mr_bump/pull/64)
+
 # 0.3.3
 * Fix crash when there is only a single merge item and no comment - [PR](https://github.com/xulaus/mr_bump/pull/62), [Issue](https://github.com/xulaus/mr_bump/issues/60)
 
