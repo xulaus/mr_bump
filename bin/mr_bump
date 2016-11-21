@@ -111,7 +111,7 @@ unless develop
   end
 end
 
-unless options[:dryrun] || system('git remote update > /dev/null 2>&1')
+unless options[:dryrun] || system('git fetch --tags > /dev/null 2>&1')
   puts 'Failed to update remotes. (Connectivity problems?)'
   exit 1
 end
