@@ -1,3 +1,7 @@
+# 0.3.5
+* Get tags on update - [PR](https://github.com/xulaus/mr_bump/pull/69), [Issue](https://github.com/xulaus/mr_bump/issues/68)
+* Ensure gemfile is fully ruby < 2 compatable - [PR](https://github.com/xulaus/mr_bump/pull/67)
+
 # 0.3.4
 * Strip DevIDs from the beginning of change log comments - [PR](https://github.com/xulaus/mr_bump/pull/64)
 
