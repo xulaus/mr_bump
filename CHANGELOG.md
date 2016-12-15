@@ -1,3 +1,8 @@
+# 0.3.6
+* Fix bug where slightly corrupt change-log fails to parse - [PR](https://github.com/xulaus/mr_bump/pull/53)
+* Switch order of git operations so that mr_bump is protected from protected branches
+* Loosen dependencies for Ruby 1 and 2 compatability
+
 # 0.3.5
 * Get tags on update - [PR](https://github.com/xulaus/mr_bump/pull/69), [Issue](https://github.com/xulaus/mr_bump/issues/68)
 * Ensure gemfile is fully ruby < 2 compatable - [PR](https://github.com/xulaus/mr_bump/pull/67)

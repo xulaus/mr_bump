@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name               = 'mr_bump'
-  s.version            = '0.3.5'
+  s.version            = '0.3.6'
   s.licenses           = ['MPL-2.0']
   s.default_executable = 'mr_bump'
   s.executables        = ['mr_bump']
@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.files = [
     'lib/mr_bump.rb', 'lib/mr_bump/version.rb', 'lib/mr_bump/slack.rb', 'lib/mr_bump/config.rb',
     'bin/mr_bump', 'lib/mr_bump/git_config.rb', 'lib/mr_bump/git_api.rb', 'lib/mr_bump/change.rb',
-    'defaults.yml'
+    'lib/mr_bump/regex_template.rb', 'defaults.yml'
   ]
   s.test_files = Dir['spec/**/*']
   s.homepage = 'https://github.com/xulaus/mr_bump'
@@ -24,8 +24,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.6.2'
   s.summary = 'BUMP!'
   s.add_dependency 'slack-notifier', '~> 1.0'
-  s.add_dependency 'octokit', '~> 3.0'
-  s.add_dependency 'mustache', '~> 0.99.3'
+  s.add_dependency 'octokit', ['>= 3.0', '<= 5.0']
+  s.add_dependency 'mustache', ['>= 0.99.3', '< 2.0']
   s.add_dependency 'OptionParser'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'pry'

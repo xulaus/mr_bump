@@ -99,7 +99,7 @@ unless develop
       puts github_client.sorted_prs(MrBump.git_config.path)
       loop do
         print 'Enter the PR number to merge : '
-        pr_id = gets.chomp
+        pr_id = STDIN.gets.chomp
         if options[:dryrun]
           puts "dryrun: Would merge ##{pr_id}"
         else
@@ -205,10 +205,13 @@ menu '[A]ccept these changes / Manually [E]dit / [C]ancel Release' do |choice|
   MrBump.file_prepend(changelog, md_changes) unless options[:dryrun]
 end
 
-if run("git commit -m 'Bump version to #{new_release}' -- #{changelog}") &&
+push_branch_cmd = develop ? "git push --set-upstream origin #{new_branch}" : 'git push'
+
+if (!develop || run("git checkout -b #{new_branch}")) &&
+   run("git commit -m 'Bump version to #{new_release}' -- #{changelog}") &&
    run("git tag #{new_release}") &&
-   run('git push && git push --tags') &&
-   (!develop || run("git checkout -b #{new_branch} && git push --set-upstream origin #{new_branch}"))
+   run(push_branch_cmd) &&
+   run("git push origin :refs/tags/#{new_release}")
   MrBump.slack_notifier(new_release, changes) unless options[:dryrun]
 
   branch_type = master ? 'master' : 'release'
