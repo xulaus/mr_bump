@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'OptionParser'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'pry'
+  s.add_development_dependency 'rb-readline'
   s.add_development_dependency 'simplecov'
   s.add_development_dependency 'json', '~> 1.8'
   s.add_development_dependency 'tins', '~> 1.6.0'

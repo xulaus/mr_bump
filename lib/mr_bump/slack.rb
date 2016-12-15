@@ -8,12 +8,14 @@ module MrBump
   class Slack
     attr_accessor :webhook, :username, :jira_url, :icon, :git
 
-    def initialize(git_config, opts)
+    def initialize(git_config, config)
+      opts = config['slack'] || {}
       raise ArgumentError, 'No Slack webhook found.' unless opts['webhook_url']
       @webhook = opts['webhook_url']
       @username = opts['username'] || 'Mr Bump'
       @jira_url = opts['jira_url']
       @icon = Array(opts['icon']).sample
+      @config = config
       @git = git_config
     end
 
@@ -29,7 +31,13 @@ module MrBump
     end
 
     def jira_ids(changes)
-      changes.split('* ').map { |i| i.split(' - ', 3)[1] }.compact
+      changes.split(/$\n?(?=\s*\*)/).map do |i|
+        begin
+          MrBump::Change.from_md(@config, i).dev_id
+        rescue ArgumentError
+          nil
+        end
+      end.compact
     end
 
     def jira_urls(changes)

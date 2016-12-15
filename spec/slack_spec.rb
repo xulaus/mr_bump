@@ -8,9 +8,11 @@ require 'mr_bump/slack'
 describe MrBump::Slack do
   let(:config) do
     {
-      'webhook_url' => webhook_url,
-      'username' => username,
-      'icon' => icons
+      'slack' => {
+        'webhook_url' => webhook_url,
+        'username' => username,
+        'icon' => icons
+      }
     }
   end
   let(:git_config) { {} }
@@ -91,6 +93,53 @@ describe MrBump::Slack do
       end
       it 'uses the single given icon' do
         expect(slack.icon).to eq(icons)
+      end
+    end
+  end
+
+  describe '#jira_ids' do
+    let(:result) do
+      described_class.new(
+        {},
+        'slack' => { 'webhook_url' => 'dummy' },
+        'markdown_template' => ' * {{branch_type}} - {{dev_id}} - {{first_comment_line}}' \
+                               "{{#comment_body}}\n  {{.}}{{/comment_body}}"
+      ).jira_ids(changes)
+    end
+
+    context 'when fed mixed changes in the default format' do
+      let(:changes) do
+        <<-CHANGES
+ * Task - HSDA-123 - jsldafbaksjdblkab
+ * Feature - QUAD-213 - asdbasn
+ * Bugfix - UKNO-17 - akssnjlsand;kajnsd
+   asmdhakjsdhgkaadsdasdsaafssdfgadfa
+ * Hotfix - Yo-421 - kjfnjdns
+CHANGES
+      end
+      let(:devids) { ['HSDA-123', 'QUAD-213', 'UKNO-17', 'Yo-421'] }
+
+      it "extracts the DevID's where possible" do
+        expect(result).to eq(devids)
+      end
+    end
+
+    context "when fed mixed changes without DevID's" do
+      let(:changes) do
+        <<-CHANGES
+ * Task - HSDA-123 - jsldafbaksjdblkab
+ * Feature - asd213
+ * Bugfix - UKNO-17 - akssnjlsand;kajnsd
+   asmdhakjsdhgkaadsdasdsaafssdfgadfa
+ * Bugfix - akssnjlsand;kajnsd
+   asmdhakjsdhgkaadsdasdsaafssdfgadfa
+ * Hotfix - Yo-421 - kjfnjdns
+CHANGES
+      end
+      let(:devids) { ['HSDA-123', 'UKNO-17', 'Yo-421'] }
+
+      it "extracts the DevID's where possible" do
+        expect(result).to eq(devids)
       end
     end
   end

@@ -113,7 +113,7 @@ module MrBump
   def self.change_log_items_for_range(rev, head)
     ignored_branch = Regexp.new("^(#{release_branch_regex}|master|develop)$")
     make_change = lambda do |title, comment = []|
-      change = MrBump::Change.new(config_file, title, comment)
+      change = MrBump::Change.from_gitlog(config_file, title, comment)
       change unless ignored_branch.match(change.branch_name)
     end
 
@@ -146,7 +146,7 @@ module MrBump
 
   def self.slack_notifier(version, changelog)
     if config_file.key? 'slack'
-      MrBump::Slack.new(git_config, config_file['slack']).bump(version, changelog)
+      MrBump::Slack.new(git_config, config_file).bump(version, changelog)
     end
   end
 
