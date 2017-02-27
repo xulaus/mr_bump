@@ -171,9 +171,13 @@ if develop
   exit 1 unless user_inp.strip == new_branch
 end
 
+projects = MrBump.config_file['projects']
 changes = MrBump.change_log_items_for_range(last_release, MrBump.current_branch)
             .reject(&:no_detail?)
-            .map(&:to_md)
+            .group_by { |change| projects[(change.dev_id || '').upcase.split('-').first] }
+            .sort_by { |title, changes| projects.values.find_index(title) || Float::INFINITY }
+            .flat_map { |title, changes| ["###{title}", *changes.map(&:to_md), ''] }
+
 changes = changes.join("\n")
 md_changes = "# #{new_release}\n#{changes}\n\n"
 
