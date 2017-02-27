@@ -39,6 +39,10 @@ module MrBump
       end
     end
 
+    def no_detail?
+      comment_lines.empty? && dev_id.nil?
+    end
+
     def first_comment_line
       comment_lines.first
     end
