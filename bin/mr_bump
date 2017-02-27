@@ -171,7 +171,9 @@ if develop
   exit 1 unless user_inp.strip == new_branch
 end
 
-changes = MrBump.change_log_items_for_range(last_release, MrBump.current_branch).map(&:to_md)
+changes = MrBump.change_log_items_for_range(last_release, MrBump.current_branch)
+            .reject(&:has_no_detail?)
+            .map(&:to_md)
 changes = changes.join("\n")
 md_changes = "# #{new_release}\n#{changes}\n\n"
 
