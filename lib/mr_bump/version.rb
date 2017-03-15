@@ -7,7 +7,7 @@ module MrBump
   # conversion to and from strings
   class Version
     include Comparable
-    attr_reader :major, :minor, :patch
+    attr_accessor :major, :minor, :patch
     def initialize(version_str)
       regex = Regexp.new('^([0-9]+)(\.([0-9]+)(\.([0-9]*))?)?')
       numbers = version_str.match(regex).captures

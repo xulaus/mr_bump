@@ -45,11 +45,11 @@ module MrBump
 
   def self.last_release
     if on_release_branch? || (on_master_branch? && release_stale?)
-      MrBump.current_uat
+      current_uat
     elsif on_master_branch?
-      MrBump.current_master
+      current_master
     elsif on_develop_branch?
-      MrBump.current_uat_major
+      current_uat_major || begin ver = current_master; ver.patch = 0; ver end
     end
   end
 
@@ -67,7 +67,7 @@ module MrBump
     branches.map do |branch|
       matches = regex.match(branch)
       MrBump::Version.new(matches[1]) if matches
-    end.compact.max || MrBump::Version.new('0.0.0')
+    end.compact.max
   end
 
   def self.current_uat_major
@@ -95,12 +95,13 @@ module MrBump
 
   def self.current_uat
     uat = current_uat_major
+    return nil unless uat
     all_tagged_versions.select { |ver| ver.major == uat.major && ver.minor == uat.minor }.max
   end
 
   def self.current_master
     uat = current_uat_major
-    all_tagged_versions.select { |ver| ver < uat }.max
+    uat ? all_tagged_versions.select { |ver| ver < uat }.max : all_tagged_versions.max
   end
 
   def self.merge_logs(rev, head)

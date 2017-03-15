@@ -121,7 +121,8 @@ unless `git rev-parse @` == `git rev-parse @{u}`
   exit 1 unless options[:dryrun]
 end
 
-unless MrBump.all_tagged_versions.include? MrBump.current_uat_major
+last_uat_major = develop ? MrBump.last_release : MrBump.current_uat_major
+unless MrBump.all_tagged_versions.include?(last_uat_major)
   base_sha = `git merge-base #{MrBump.uat_branch} develop`
 
   puts "Missing tag for version #{MrBump.current_uat_major}. Suggesting commit #{base_sha[0...8]}"
@@ -150,7 +151,8 @@ if MrBump.release_stale?
 end
 
 last_release = MrBump.last_release
-unless last_release
+new_release = MrBump.next_release
+unless new_release
   if master
     puts "Couldn't detect the version of the master branch. " \
          'At least one tagged version with version less than the current release version ' \
@@ -161,7 +163,6 @@ unless last_release
   exit 1
 end
 
-new_release = MrBump.next_release
 if develop
   new_branch = MrBump.release_branch_for_version(new_release)
   print "You are about to cut a release branch. If you are sure you want to do this type: \n" \

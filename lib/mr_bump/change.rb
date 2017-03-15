@@ -31,11 +31,16 @@ module MrBump
       @branch_name = branch_name
       @dev_id = dev_id
       @pr_number = pr_number || ''
-      @comment_lines = Array(comment_lines)
+      @comment_lines = Array(comment_lines).map(&:strip)
       unless @comment_lines.empty? || @dev_id.nil?
         id = Regexp.escape(@dev_id)
         prefix_regex = /^(\[#{id}\]|\(#{id}\)|#{id})\s*([:\-]\s*)?/
-        @comment_lines[0] = @comment_lines[0].sub(prefix_regex, '')
+        new_first_line = @comment_lines[0].sub(prefix_regex, '')
+        if new_first_line.empty?
+          @comment_lines.shift
+        else
+          @comment_lines[0] = new_first_line
+        end
       end
     end
 
