@@ -65,7 +65,7 @@ module MrBump
   def self.latest_release_from_list(branches)
     regex = Regexp.new("^origin/#{release_branch_regex}$")
     branches.map do |branch|
-      matches = regex.match(branch)
+      matches = regex.match(branch.force_encoding("UTF-8"))
       MrBump::Version.new(matches[1]) if matches
     end.compact.max || MrBump::Version.new('0.0.0')
   end
