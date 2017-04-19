@@ -1,3 +1,7 @@
+# 0.3.7
+* Enforce UTF-8 encoding on reading branch names - [PR](https://github.com/xulaus/mr_bump/pull/73)
+* Ignore empty changes - [PR](https://github.com/xulaus/mr_bump/pull/72)
+
 # 0.3.6
 * Fix bug where slightly corrupt change-log fails to parse - [PR](https://github.com/xulaus/mr_bump/pull/53)
 * Switch order of git operations so that mr_bump is protected from protected branches
